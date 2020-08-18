@@ -1,0 +1,25 @@
+{
+  "name": "buy-sell",
+  "version": "1.0.0",
+  "description": "Куплю. Продам",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run eslint",
+    "eslint": "eslint --ext .js src/",
+    "start": "node ./src/service/service.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/InNOcentos/buy-sell.git"
+  },
+  "author": "Boris",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/InNOcentos/buy-sell/issues"
+  },
+  "homepage": "https://github.com/InNOcentos/buy-sell#readme",
+  "devDependencies": {
+    "eslint": "7.7.0",
+    "eslint-config-htmlacademy": "0.5.2"
+  }
+}
