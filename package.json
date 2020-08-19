@@ -2,11 +2,12 @@
   "name": "buy-sell",
   "version": "1.0.0",
   "description": "Куплю. Продам",
-  "main": "index.js",
+  "main": "./src/service/service.js",
   "scripts": {
     "test": "npm run eslint",
     "eslint": "eslint --ext .js src/",
-    "start": "node ./src/service/service.js"
+    "start": "node ./src/service/service.js",
+    "server": "nodemon ./src/service/service.js -- --server 3000"
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,10 @@
   "homepage": "https://github.com/InNOcentos/buy-sell#readme",
   "devDependencies": {
     "eslint": "7.7.0",
-    "eslint-config-htmlacademy": "0.5.2"
+    "eslint-config-htmlacademy": "0.5.2",
+    "nodemon": "2.0.4"
+  },
+  "dependencies": {
+    "chalk": "^4.1.0"
   }
 }
