@@ -4,11 +4,12 @@
   "description": "Куплю. Продам",
   "main": "./src/service/service.js",
   "scripts": {
-    "test": "npm run eslint",
     "eslint": "eslint --ext .js src/",
+    "test::rest": "jest .e2e.test.js",
     "start": "node ./src/service/service.js",
-    "start-server": "nodemon ./src/service/service.js -- --server 3000",
-    "start-f-server": "nodemon ./src/express/index.js"
+    "start-server": "env LOG_LEVEL=error nodemon ./src/service/service.js --server 3000 | pino-pretty",
+    "start-f-server": "nodemon ./src/express/index.js",
+    "debug": "env LOG_LEVEL=debug nodemon ./src/service/service.js --server 3000 | pino-pretty"
   },
   "repository": {
     "type": "git",
@@ -23,13 +24,17 @@
   "devDependencies": {
     "eslint": "7.7.0",
     "eslint-config-htmlacademy": "0.5.2",
-    "nodemon": "2.0.4"
+    "jest": "26.4.2",
+    "nodemon": "2.0.4",
+    "pino-pretty": "4.1.0",
+    "supertest": "4.0.2"
   },
   "dependencies": {
     "chalk": "^4.1.0",
     "express": "4.17.1",
     "express-formidable": "1.2.0",
     "nanoid": "3.1.12",
+    "pino": "6.5.1",
     "pug": "3.0.0"
   }
 }
