@@ -37,7 +37,7 @@ const PictureRestrict = {
 
 
 
-const getPictureFileName = (number) => number > 10 ? `item${number}.jpg` : `item0${number}.jpg`;
+const getPictureFileName = (number) => number >= 10 ? `item${number}.jpg` : `item0${number}.jpg`;
 
 const readContent = async (filePath) => {
   try {
