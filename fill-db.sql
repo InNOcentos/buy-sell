@@ -26,7 +26,7 @@ INSERT INTO categories VALUES
 /* offers_categories */
 
 INSERT INTO offers_categories VALUES
-(1,5),
+(1,6),
 (2,4),
 (3,3),
 (4,2),
@@ -36,19 +36,16 @@ INSERT INTO offers_categories VALUES
 
 INSERT INTO types VALUES
 (1,'Куплю'),
-(2,'Продам'),
-(3,'Продам'),
-(4,'Куплю'),
-(5,'Куплю');
+(2,'Продам');
 
 /* offers_types */
 
 INSERT INTO offers_types VALUES
 (1,1),
 (2,1),
-(3,3),
-(4,5),
-(5,4);
+(3,2),
+(4,2),
+(5,1);
 
 /* comments */
 
