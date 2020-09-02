@@ -1,16 +1,11 @@
-'use strict';
+"use strict";
 
-const {
-  Router
-} = require(`express`);
+const { Router } = require(`express`);
 
-const {
-  HttpCode
-} = require(`../../constants`);
+const { HttpCode } = require(`../../constants`);
 
-const {
-  getLogger
-} = require(`../logs/logger`);
+const { getLogger } = require(`../logs/logger`);
+
 const logger = getLogger();
 
 const route = new Router();
@@ -23,7 +18,7 @@ module.exports = (app, service) => {
 
     const categories = service.findAll();
     res.status(HttpCode.OK).json(categories);
-    
+
     logger.info(`End request with status code ${res.statusCode}`);
   });
 };

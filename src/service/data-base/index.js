@@ -12,7 +12,6 @@ const sequelize = new Sequelize(config.db_name,config.db_user_name,config.db_use
 const Category = require(path.join(__dirname,'./models/category'))(sequelize,Sequelize.DataTypes);
 const Offer = require(path.join(__dirname,'./models/offer'))(sequelize,Sequelize.DataTypes);
 const Comment = require(path.join(__dirname,'./models/comment'))(sequelize,Sequelize.DataTypes);
-const Type = require(path.join(__dirname,'./models/type'))(sequelize,Sequelize.DataTypes);
 const User = require(path.join(__dirname,'./models/user'))(sequelize,Sequelize.DataTypes);
 
 
@@ -33,15 +32,12 @@ Offer.belongsTo(User, {
     as: `user`,
     foreignKey: `userId`
 });
-Offer.belongsTo(Type, {
-    as: `type`,
-    foreignKey: `typeId`
-});
 
 Offer.belongsToMany(Category, {
-    through: `offer_category`,
-    as: `categories`,
-    foreignKey: `offer_id`
+    through: `offers_categories`,
+    foreignKey: `offerId`,
+    timestamps: false,
+    paranoid: false,
 });
 
 Offer.hasMany(Comment, {
@@ -52,18 +48,10 @@ Offer.hasMany(Comment, {
 // CATEGORIES
 
 Category.belongsToMany(Offer, {
-    through: `offer_category`,
-    as: `offers`,
-    foreignKey: `category_id`,
+    through: `offers_categories`,
+    foreignKey: `categoryId`,
     timestamps: false,
     paranoid: false,
-});
-
-//TYPES
-
-Type.hasMany(Offer, {
-    as: `offers`,
-    foreignKey: `typeId`
 });
 
 // COMMENTS
@@ -80,7 +68,7 @@ Comment.belongsTo(Offer, {
 
 const initDb = async () => {
     try {
-        await sequelize.sync({ force: true});
+        await sequelize.sync({force: true});
         console.info(`Структура БД успешно создана.`);
     } catch (err) {
         console.error(`Не удалось создать таблицы в БД ${err}`);
@@ -91,5 +79,11 @@ const initDb = async () => {
 
 module.exports = {
     sequelize,
-    initDb
+    initDb,
+    models: {
+        User,
+        Category,
+        Offer,
+        Comment
+    }
 }

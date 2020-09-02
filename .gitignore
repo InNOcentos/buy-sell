@@ -17,6 +17,7 @@ build/
 
 # Моки
 mocks.json
+test.json
 
 # TODO 
 fixes.todo

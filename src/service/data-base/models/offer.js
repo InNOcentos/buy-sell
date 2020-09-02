@@ -21,18 +21,23 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false
       },
+      type: {
+        type: sequelize.Sequelize.ENUM,
+        values: [`buy`, `sell`],
+        allowNull: false,
+      },
       description: {
         type: DataTypes.STRING,
         allowNull: false,
       },
       createdAt: {
+        field: `createdDate`,
         type: DataTypes.DATEONLY,
-        field: 'created_date'
       }
     },
     {
       sequelize,
-      timestamps: false,
+      updatedAt: false,
       paranoid: false,
       modelName: 'offer',
     }

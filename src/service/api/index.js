@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-const {Router} = require(`express`);
+const { Router } = require(`express`);
 const category = require(`../api/category`);
 const offer = require(`../api/offer`);
 const search = require(`../api/search`);
@@ -25,4 +25,3 @@ const app = new Router();
 })();
 
 module.exports = app;
-

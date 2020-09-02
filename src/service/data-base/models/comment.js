@@ -15,11 +15,11 @@ module.exports = (sequelize, DataTypes) => {
         },
         createdAt: {
           type: DataTypes.DATEONLY,
-          field: 'created_date'
+          field: `createdDate`
         }
     }, {
         sequelize,
-        timestamps: false,
+        updatedAt: false,
         paranoid: false,
         modelName: 'comment'
     });
