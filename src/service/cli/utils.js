@@ -71,7 +71,12 @@ const PasswordRestrict = {
 
 const OfferSumRestrict = {
   MIN: 10000,
-  MAX: 99999999,
+  MAX: 9999999,
+};
+
+const PictureRestrict = {
+  MIN: 1,
+  MAX: 16,
 };
 
 const DAY_IN_MILLISECONDS = 86400000;
@@ -177,9 +182,8 @@ exports.createOffers = async (count, users) => {
 
       const id = index + 1;
       const title = titles[getRandomInt(0, titles.length - 1)];
-      const image = `item${printNumWithLead0(id)}.jpg`;
-      const sum =
-        getRandomInt(OfferSumRestrict.MIN, OfferSumRestrict.MAX) / 100;
+      const image = `item${printNumWithLead0(getRandomInt(PictureRestrict.MIN, PictureRestrict.MAX))}.jpg`;
+      const sum = Math.round(getRandomInt(OfferSumRestrict.MIN, OfferSumRestrict.MAX) / 100);
       const type = types[getRandomInt(0, types.length - 1)];
       const description = createOfferDescription(sentences);
       const createdDate = createRandomDate();

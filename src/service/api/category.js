@@ -4,21 +4,19 @@ const { Router } = require(`express`);
 
 const { HttpCode } = require(`../../constants`);
 
-const { getLogger } = require(`../logs/logger`);
-
-const logger = getLogger();
 
 const route = new Router();
 
-module.exports = (app, service) => {
+module.exports = (app, categortyService) => {
   app.use(`/category`, route);
 
-  route.get(`/`, (req, res) => {
-    logger.debug(`Start request to url /category`);
+  route.get(`/`, async (req, res, next) => {
+    try {
+      const categories = await categortyService.findAll();
 
-    const categories = service.findAll();
-    res.status(HttpCode.OK).json(categories);
-
-    logger.info(`End request with status code ${res.statusCode}`);
+      res.status(HttpCode.OK).json(categories);
+    } catch (error) {
+      console.log(error.message)
+    }
   });
 };

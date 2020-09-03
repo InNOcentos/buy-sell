@@ -7,7 +7,7 @@
     "eslint": "eslint --ext .js src/",
     "test::rest": "jest .e2e.test.js",
     "start": "node ./src/service/service.js",
-    "start-server": "env LOG_LEVEL=error nodemon ./src/service/service.js --server 3000 | pino-pretty",
+    "start-server": "env LOG_LEVEL=debug nodemon ./src/service/service.js --server 3000 | pino-pretty",
     "start-f-server": "nodemon ./src/express/index.js",
     "debug": "env LOG_LEVEL=debug nodemon ./src/service/service.js --server 3000 | pino-pretty"
   },

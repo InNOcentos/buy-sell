@@ -68,7 +68,7 @@ Comment.belongsTo(Offer, {
 
 const initDb = async () => {
     try {
-        await sequelize.sync({force: true});
+        await sequelize.sync({force:true});
         console.info(`Структура БД успешно создана.`);
     } catch (err) {
         console.error(`Не удалось создать таблицы в БД ${err}`);

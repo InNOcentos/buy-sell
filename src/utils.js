@@ -16,3 +16,9 @@ module.exports.shuffle = (someArray) => {
   }
   return someArray;
 };
+
+exports.hasAllExpectedProperties = (object, expectedProperties) => {
+  const objectProperties = Object.keys(object);
+
+  return expectedProperties.every((expectedProperty) => objectProperties.includes(expectedProperty));
+};

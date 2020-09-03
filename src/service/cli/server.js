@@ -26,8 +26,7 @@ module.exports = {
     const port = Number.parseInt(customPort, 10) || DEFAULT_PORT;
 
     try {
-      await initDb();
-      await sequelize.close();
+      await sequelize.sync();
     } catch (err) {
       logger.error(`An error has occurred. Error: ${err.message}`);
       process.exit(ExitCode.error);

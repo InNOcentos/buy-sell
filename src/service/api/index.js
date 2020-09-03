@@ -6,10 +6,10 @@ const offer = require(`../api/offer`);
 const search = require(`../api/search`);
 
 const getMockData = require(`../lib/get-mock-data`);
+const database = require('../data-base');
 
 const {
   CategoryService,
-  SearchService,
   OfferService,
   CommentService,
 } = require(`../data-service`);
@@ -19,9 +19,9 @@ const app = new Router();
 (async () => {
   const mockData = await getMockData();
 
-  category(app, new CategoryService(mockData));
-  search(app, new SearchService(mockData));
-  offer(app, new OfferService(mockData), new CommentService());
+  category(app, new CategoryService(database));
+  search(app, new OfferService(database));
+  offer(app, new OfferService(database), new CommentService(database));
 })();
 
 module.exports = app;

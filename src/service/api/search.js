@@ -1,36 +1,38 @@
-'use strict';
+"use strict";
+const { Router } = require(`express`);
 
-const {Router} = require(`express`);
-const {HttpCode} = require(`../../constants`);
-const {
-  getLogger
-} = require(`../logs/logger`);
-const logger = getLogger();
+const { HttpCode } = require(`../../constants`);
 
 const route = new Router();
 
-module.exports = (app, service) => {
+module.exports = (app, offerService) => {
   app.use(`/search`, route);
 
-  route.get(`/`, (req, res) => {
-    logger.debug(`Start request to url /search`);
+  route.get(`/`, async (req, res, next) => {
+    const decodedQuery = decodeURI(req.query.query);
 
-    const {query = ``} = req.query;
-
-    if (!query) {
-      res.status(HttpCode.BAD_REQUEST).json([]);
-
-      logger.error(`End request with error ${res.statusCode}`);
-
-      return;
+    if (!decodedQuery) {
+      res.status(HttpCode.BAD_REQUEST).send(`Invalid query`);
+      return console.error(`Invalid query.`);
     }
 
-    const searchResults = service.findAll(query);
-    const searchStatus = searchResults.length > 0 ? HttpCode.OK : HttpCode.NOT_FOUND;
+    try {
+      const foundedOffers = await offerService.findAllByTitle(decodedQuery);
 
-    res.status(searchStatus)
-      .json(searchResults);
+      if (!foundedOffers.length) {
+        res
+          .status(HttpCode.NOT_FOUND)
+          .send(`Not found offers which includes: ${decodedQuery}`);
+        return console.error(
+          `Not found offers which includes: ${decodedQuery}.`
+        );
+      }
 
-    logger.info(`End request with status code ${res.statusCode}`);
+      return res.status(HttpCode.OK).json(foundedOffers);
+    } catch (error) {
+      next(error);
+    }
+
+    return null;
   });
 };

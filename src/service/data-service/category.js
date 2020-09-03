@@ -1,17 +1,26 @@
 'use strict';
 
 class CategoryService {
-  constructor(offers) {
-    this._offers = offers;
+  constructor(dataBase) {
+    const {models} = dataBase;
+
+    this._dataBase = dataBase;
+    this._models = models;
+    this._selectOptions = {
+      raw: true,
+    };
   }
 
-  findAll() {
-    const categories = this._offers.reduce((acc, offer) => {
-      acc.add(...offer.category);
-      return acc;
-    }, new Set());
+  async findAll() {
+    const {Category} = this._models;
 
-    return [...categories];
+    try {
+      return await Category.findAll(this._selectOptions);
+    } catch (error) {
+      console.error(`Can't find categories. Error: ${ error }`);
+
+      return null;
+    }
   }
 }
 
