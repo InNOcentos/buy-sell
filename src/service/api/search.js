@@ -35,4 +35,16 @@ module.exports = (app, offerService) => {
 
     return null;
   });
+
+  route.get(`/:categoryId`, async (req, res, next) => {
+    const {categoryId} = req.params;
+
+    try {
+      const offersByCategory = await offerService.findAllByCategory(categoryId);
+
+      res.status(HttpCode.OK).json(offersByCategory);
+    } catch (error) {
+      next(error);
+    }
+  });
 };

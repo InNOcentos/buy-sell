@@ -10,7 +10,7 @@ class CommentService {
       attributes: [
         `id`,
         `message`,
-        `created_date`,
+        `createdDate`,
       ],
     };
   }

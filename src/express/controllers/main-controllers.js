@@ -10,8 +10,8 @@ exports.getHomePage = async (req, res, next) => {
   let categories;
 
   try {
-    const {statusCode, body} = await request.get({
-      url: `${ API_URL }/offers?limit=${ OFFERS_LIMIT_QUANTITY_ON_PAGE }`,
+    const { statusCode, body } = await request.get({
+      url: `${API_URL}/offers?limit=${OFFERS_LIMIT_QUANTITY_ON_PAGE}`,
       json: true,
     });
 
@@ -23,8 +23,8 @@ exports.getHomePage = async (req, res, next) => {
   }
 
   try {
-    const {statusCode, body} = await request.get({
-      url: `${ API_URL }/category`,
+    const { statusCode, body } = await request.get({
+      url: `${API_URL}/category`,
       json: true,
     });
 
@@ -35,18 +35,37 @@ exports.getHomePage = async (req, res, next) => {
     next(error);
   }
 
-  res.render(`main`, {offers , categories});
+  res.render(`main`, { offers, categories });
 };
 
 exports.getSearch = async (req, res, next) => {
-  try {
-    const encodedQuery = encodeURI(req.query.search);
 
-    const {statusCode, body} = await request.get({url: `${ API_URL }/search?query=${ encodedQuery }`, json: true});
-    const results = statusCode === HttpCode.OK ? body : [];
-
-    res.render(`search-result`, {results});
-  } catch (error) {
-    next(error);
+  if (req.query.search) {
+    try {
+      const encodedQuery = encodeURI(req.query.search);
+  
+      const {statusCode, body} = await request.get({url: `${ API_URL }/search?query=${ encodedQuery }`, json: true});
+      const results = statusCode === HttpCode.OK ? body : [];
+  
+      res.render(`search-result`, {results});
+    } catch (error) {
+      next(error);
+    }
+  }
+ 
+  if (req.query.category) {
+    try {
+      const categoryId = req.query.category;
+  
+      const { statusCode, body } = await request.get({
+        url: `${API_URL}/search/${categoryId}`,
+        json: true,
+      });
+      const results = statusCode === HttpCode.OK ? body : [];
+  
+      res.render(`search-result`, { results });
+    } catch (error) {
+      next(error);
+    }
   }
 };

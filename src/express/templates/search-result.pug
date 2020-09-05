@@ -13,7 +13,7 @@ block content
             li.search-results__item
               div(class='ticket-card ticket-card--color0' + (index.toString().slice(-1)))
                 .ticket-card__img
-                  img(src='/img/' + result.picture, srcset='/img/' + (result.picture.replace(/\.\w+$/, '')) + '@2x' + (result.picture.match(/\.\w+$/)) +' 2x', alt=result.title)
+                  img(src='/img/' + result.picture, srcset='/img/' + result.picture + '@2x 2x', alt=result.title)
                 .ticket-card__info
                   span.ticket-card__label
                     if result.type === 'sell'
@@ -21,8 +21,11 @@ block content
                     else if result.type === 'buy'
                       | Куплю
                   .ticket-card__categories
-                    each category in result.category
-                      a(href='#') #{category}
+                    if (result.category)
+                      each category in result.category
+                        a(href='#') #{category}
+                    else if (result.categories)
+                      a(href='#') #{result.categories[0].title}
                   .ticket-card__header
                     h3.ticket-card__title
                       a(href='#') #{result.title}

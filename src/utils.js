@@ -22,3 +22,5 @@ exports.hasAllExpectedProperties = (object, expectedProperties) => {
 
   return expectedProperties.every((expectedProperty) => objectProperties.includes(expectedProperty));
 };
+
+

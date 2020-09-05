@@ -55,7 +55,7 @@ module.exports = (app, offerService, commentService) => {
 
   route.put(`/:offerId`, [isOfferExistsMiddleware, isRequestDataValidMiddleware], async (req, res, next) => {
     const {offerId} = req.params;
-    const {category, description, picture, title, type, sum} = req.body;
+    const {category, description, picture, title, type, sum} = req.query;
 
     try {
       const updatedOffer = await offerService.update({id: offerId, category, description, picture, title, type, sum});

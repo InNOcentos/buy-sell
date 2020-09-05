@@ -1,10 +1,9 @@
-'use strict';
-
+"use strict";
 
 class OfferService {
   constructor(dataBase) {
-    const {sequelize, models} = dataBase;
-    const {Category} = models;
+    const { sequelize, models } = dataBase;
+    const { Category } = models;
 
     this._dataBase = dataBase;
     this._models = models;
@@ -24,17 +23,25 @@ class OfferService {
         `sum`,
         `type`,
         `description`,
-        [sequelize.fn(`ARRAY_AGG`, sequelize.col(`categories.title`)), `category`],
+        [
+          sequelize.fn(`ARRAY_AGG`, sequelize.col(`categories.title`)),
+          `category`,
+        ],
       ],
-      group: [`offer.id`, `offer.title`, `offer.image`, `offer.sum`, `offer.type`, `offer.description`],
-      order: [
-        [`createdDate`, `DESC`],
+      group: [
+        `offer.id`,
+        `offer.title`,
+        `offer.image`,
+        `offer.sum`,
+        `offer.type`,
+        `offer.description`,
       ],
+      order: [[`createdDate`, `DESC`]],
     };
   }
 
-  async findAll({offset, limit}) {
-    const {Offer} = this._models;
+  async findAll({ offset, limit }) {
+    const { Offer } = this._models;
 
     try {
       const [quantity, offers] = await Promise.all([
@@ -52,15 +59,22 @@ class OfferService {
         quantity,
       };
     } catch (error) {
-      console.error(`Can't findAll offers. Error: ${ error }`);
+      console.error(`Can't findAll offers. Error: ${error}`);
 
       return [];
     }
   }
 
-  async create({categories: categoriesIds, description, picture, title, type, sum}) {
-    const {sequelize} = this._dataBase;
-    const {Offer, Category, User} = this._models;
+  async create({
+    categories: categoriesIds,
+    description,
+    picture,
+    title,
+    type,
+    sum,
+  }) {
+    const { sequelize } = this._dataBase;
+    const { Offer, Category, User } = this._models;
 
     try {
       const user = await User.findByPk(1);
@@ -85,14 +99,14 @@ class OfferService {
 
       return await Offer.findByPk(newOffer.id, this._selectOptions);
     } catch (error) {
-      console.error(`Can't create offer. Error: ${ error }`);
+      console.error(`Can't create offer. Error: ${error}`);
 
       return null;
     }
   }
 
   async isExists(id) {
-    const {Offer} = this._models;
+    const { Offer } = this._models;
     const offerId = Number.parseInt(id, 10);
 
     try {
@@ -100,41 +114,52 @@ class OfferService {
 
       return !!offer;
     } catch (error) {
-      console.error(`Can't check existence of offer. Error: ${ error }`);
+      console.error(`Can't check existence of offer. Error: ${error}`);
 
       return false;
     }
   }
 
   async findById(id) {
-    const {Offer} = this._models;
+    const { Offer } = this._models;
     const offerId = Number.parseInt(id, 10);
 
     try {
       return await Offer.findByPk(offerId, this._selectOptions);
     } catch (error) {
-      console.error(`Can't find offer. Error: ${ error }`);
+      console.error(`Can't find offer. Error: ${error}`);
 
       return null;
     }
   }
 
-  async update({id, category: categoriesIds, description, picture, title, type, sum}) {
-    const {sequelize} = this._dataBase;
-    const {Offer, Category} = this._models;
+  async update({
+    id,
+    category: categoriesIds,
+    description,
+    picture,
+    title,
+    type,
+    sum,
+  }) {
+    const { sequelize } = this._dataBase;
+    const { Offer, Category } = this._models;
 
     try {
-      const [updatedRows] = await Offer.update({
-        title,
-        image: picture,
-        sum,
-        type,
-        description,
-      }, {
-        where: {
-          id,
+      const [updatedRows] = await Offer.update(
+        {
+          title,
+          image: picture,
+          sum,
+          type,
+          description,
         },
-      });
+        {
+          where: {
+            id,
+          },
+        }
+      );
 
       if (!updatedRows) {
         return null;
@@ -154,14 +179,14 @@ class OfferService {
 
       return await Offer.findByPk(updatedOffer.id, this._selectOptions);
     } catch (error) {
-      console.error(`Can't update offer. Error: ${ error }`);
+      console.error(`Can't update offer. Error: ${error}`);
 
       return null;
     }
   }
 
   async delete(id) {
-    const {Offer} = this._models;
+    const { Offer } = this._models;
 
     try {
       const deletedOffer = await Offer.findByPk(id, this._selectOptions);
@@ -179,27 +204,72 @@ class OfferService {
 
       return deletedOffer;
     } catch (error) {
-      console.error(`Can't delete offer. Error: ${ error }`);
+      console.error(`Can't delete offer. Error: ${error}`);
 
       return null;
     }
   }
 
   async findAllByTitle(title) {
-    const {sequelize} = this._dataBase;
-    const {Offer} = this._models;
+    const { sequelize } = this._dataBase;
+    const { Offer } = this._models;
 
     try {
       return await Offer.findAll({
         ...this._selectOptions,
         where: {
           title: {
-            [sequelize.Sequelize.Op.iLike]: `%${ title }%`, // TODO: Не работает со строками на русском. Разобраться
+            [sequelize.Sequelize.Op.iLike]: `%${title}%`, // TODO: Не работает со строками на русском. Разобраться
           },
         },
       });
     } catch (error) {
-      console.error(`Can't find offers with title: ${ title }. Error: ${ error }`);
+      console.error(`Can't find offers with title: ${title}. Error: ${error}`);
+
+      return null;
+    }
+  }
+
+  async findAllByCategory(categoryId) {
+    const { Offer, Category } = this._models;
+    /* const {sequelize} = this._dataBase */
+    const CategoryId = Number.parseInt(categoryId, 10);
+
+    try {
+      const offers = await Offer.findAll({
+        attributes: [
+          `id`,
+          `title`,
+          [`image`, `picture`],
+          `sum`,
+          `type`,
+          `description`,
+        ],
+        include: {
+          model: Category,
+          as: 'categories',
+          through: "offers_categories",
+          where: {
+            id: CategoryId,
+          },
+         
+        }
+      });
+
+     /*  const offersCategories = await Offer.findAll({
+        ...this._selectOptions,
+        attributes: [
+          `id`,
+          [
+            sequelize.fn(`ARRAY_AGG`, sequelize.col(`categories.title`)),
+            `category`,
+          ],
+        ],
+      }) */
+
+      return await offers;
+    } catch (error) {
+      console.error(`Can't find offers. Error: ${error}`);
 
       return null;
     }
