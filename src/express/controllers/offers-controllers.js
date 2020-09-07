@@ -21,7 +21,7 @@ exports.getAddPost = async (req, res, next) => {
 
 exports.postAddPost = async (req, res, next) => {
   try {
-    const {avatar, title, description, category, sum, type} = req.query;
+    const {avatar, title, description, category, sum, type} = req.body;
 
     const offerCategories = Array.isArray(category) ? category : [category];
 
@@ -36,14 +36,14 @@ exports.postAddPost = async (req, res, next) => {
 
     const {statusCode} = await request.post({url: `${ API_URL }/offers`, json: true, body: offer});
 
-    if (statusCode === HttpStatusCode.CREATED) {
+    if (statusCode === HttpCode.CREATED) {
       return res.redirect(`/my`);
     }
 
-    const categoriesResult = await request.get({url: `${ API_URL }/categories`, json: true});
+    const categoriesResult = await request.get({url: `${ API_URL }/category`, json: true});
 
-    if (categoriesResult.statusCode === HttpStatusCode.NOT_FOUND) {
-      return res.status(HttpStatusCode.NOT_FOUND).render(`errors/404`);
+    if (categoriesResult.statusCode === HttpCode.NOT_FOUND) {
+      return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
     }
 
     return res.render(`offers/new-ticket`, {
@@ -80,13 +80,32 @@ exports.getPostEdit = async (req, res, next) => {
 exports.putPostEdit = async (req, res, next) => {
   try {
     const {id} = req.params;
-    const updatedOffer = await request.post({url: `${ API_URL }/offers/${ id }`, json: true});
+    const {avatar, title, description, category, sum, type} = req.body;
+
+    const offerCategories = Array.isArray(category) ? category : [category];
+
+    const offer = {
+      title,
+      type,
+      category: offerCategories,
+      description,
+      picture: avatar,
+      sum,
+    };
+
+    const updatedOffer = await request.put({url: `${ API_URL }/offers/${ id }`, json: true, body: offer});
 
     if (updatedOffer.statusCode === HttpCode.INTERNAL_SERVER_ERROR) {
       return res.status(HttpCode.INTERNAL_SERVER_ERROR).render(`errors/500`);
     }
 
-    return res.render(`offers/ticket-edit`,);
+    const categoriesResult = await request.get({url: `${ API_URL }/category`, json: true});
+
+    if (categoriesResult.statusCode === HttpCode.NOT_FOUND) {
+      return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
+    }
+
+    return res.render(`offers/ticket`,{offer: updatedOffer.body, categories: categoriesResult.body});
   } catch (error) {
     return next(error);
   }

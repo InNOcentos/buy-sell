@@ -1,5 +1,6 @@
 "use strict";
 
+
 class OfferService {
   constructor(dataBase) {
     const { sequelize, models } = dataBase;
@@ -77,9 +78,18 @@ class OfferService {
     const { Offer, Category, User } = this._models;
 
     try {
-      const user = await User.findByPk(1);
-
+      /* TODO: переработать генерацию id */
+      const user = await User.findByPk(4);
+      const lastId = await Offer.findAll({
+        limit: 1,
+        order: [ [ 'id', 'DESC' ]],
+        attributes: [
+          `id`
+        ]
+      });
+      const newId = Number.parseInt(lastId[0]['dataValues']['id'], 10) + 1;
       const newOffer = await user.createOffer({
+        id: newId,
         title,
         image: picture,
         sum,
@@ -95,11 +105,11 @@ class OfferService {
         },
       });
 
-      await newOffer.addCategories(categories);
-
+      await newOffer.setCategories(categories);
+      console.log(JSON.stringify(newOffer));
       return await Offer.findByPk(newOffer.id, this._selectOptions);
     } catch (error) {
-      console.error(`Can't create offer. Error: ${error}`);
+      console.error(`Can't create offer. Error: ${error.message}`);
 
       return null;
     }
@@ -255,7 +265,7 @@ class OfferService {
          
         }
       });
-
+      /* TODO: вывод всех категорий */
      /*  const offersCategories = await Offer.findAll({
         ...this._selectOptions,
         attributes: [

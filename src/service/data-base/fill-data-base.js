@@ -3,13 +3,7 @@
 exports.fillDataBase = async ({ dataBase, mocks }) => {
   const { sequelize, models } = dataBase;
   const { User, Category, Offer, Comment } = models;
-  const {
-    users,
-    categories,
-    offers,
-    comments,
-    offersCategories,
-  } = mocks;
+  const {users, categories, offers, comments, offersCategories} = mocks;
 
   try {
     await sequelize.sync();

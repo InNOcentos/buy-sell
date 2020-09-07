@@ -1,6 +1,7 @@
 "use strict";
 
 const express = require("express");
+
 const { HttpCode, API_PREFIX,ExitCode } = require(`../../constants`);
 const routes = require(`../api`);
 const getMockData = require(`../lib/get-mock-data`);
@@ -11,7 +12,9 @@ const {sequelize, initDb} = require('../data-base');
 const app = express();
 const DEFAULT_PORT = 3000;
 
+
 app.use(express.json());
+
 app.use(API_PREFIX, routes);
 
 app.use((req, res) => {

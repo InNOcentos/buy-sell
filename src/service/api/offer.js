@@ -49,14 +49,15 @@ module.exports = (app, offerService, commentService) => {
 
       res.status(HttpCode.OK).json(offer);
     } catch (error) {
+      console.log(error.message)
       next(error);
     }
   });
 
   route.put(`/:offerId`, [isOfferExistsMiddleware, isRequestDataValidMiddleware], async (req, res, next) => {
     const {offerId} = req.params;
-    const {category, description, picture, title, type, sum} = req.query;
-
+    const {category, description, picture, title, type, sum} = req.body;
+    console.log({category, description, picture, title, type, sum})
     try {
       const updatedOffer = await offerService.update({id: offerId, category, description, picture, title, type, sum});
 
