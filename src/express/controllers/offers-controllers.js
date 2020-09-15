@@ -2,18 +2,21 @@
 
 const { request } = require(`../request`);
 const { HttpCode } = require(`../../constants`);
-const {API_URL} = require(`../../constants`);
-const {chalk} = require('chalk');
+const { API_URL } = require(`../../constants`);
+const { chalk } = require("chalk");
 
 exports.getAddPost = async (req, res, next) => {
   try {
-    const {statusCode, body: categories} = await request.get({url: `${ API_URL }/category`, json: true});
+    const { statusCode, body: categories } = await request.get({
+      url: `${API_URL}/category`,
+      json: true,
+    });
 
     if (statusCode === HttpCode.NOT_FOUND) {
       return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
     }
 
-    return res.render(`offers/new-ticket`, {categories});
+    return res.render(`offers/new-ticket`, { categories });
   } catch (error) {
     return next(error);
   }
@@ -21,7 +24,17 @@ exports.getAddPost = async (req, res, next) => {
 
 exports.postAddPost = async (req, res, next) => {
   try {
-    const {avatar, title, description, category, sum, type} = req.body;
+
+    const categoriesResult = await request.get({
+      url: `${API_URL}/category`,
+      json: true,
+    });
+
+    if (categoriesResult.statusCode === HttpCode.NOT_FOUND) {
+      return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
+    }
+
+    const { avatar, title, description, category, sum, type } = req.body;
 
     const offerCategories = Array.isArray(category) ? category : [category];
 
@@ -34,17 +47,29 @@ exports.postAddPost = async (req, res, next) => {
       sum,
     };
 
-    const {statusCode} = await request.post({url: `${ API_URL }/offers`, json: true, body: offer});
+    const { statusCode, body } = await request.post({
+      url: `${API_URL}/offers`,
+      json: true,
+      body: offer,
+    });
 
     if (statusCode === HttpCode.CREATED) {
       return res.redirect(`/my`);
     }
 
-    const categoriesResult = await request.get({url: `${ API_URL }/category`, json: true});
-
-    if (categoriesResult.statusCode === HttpCode.NOT_FOUND) {
-      return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
+    if (statusCode === HttpCode.UNPROCESSABLE_ENTITY) {
+      const errorsArr = body;
+      console.log(errorsArr);
+      console.log(categoriesResult.body);
+      return res.render(`offers/new-ticket`, {
+        offer,
+        categories: categoriesResult.body,
+        errorsArr,
+      });
     }
+
+    
+    /* TODO: настроить вывод фото и категорий при ошибке валидации формы */
 
     return res.render(`offers/new-ticket`, {
       categories: categoriesResult.body,
@@ -58,20 +83,29 @@ exports.postAddPost = async (req, res, next) => {
 
 exports.getPostEdit = async (req, res, next) => {
   try {
-    const {id} = req.params;
-    const offersResult = await request.get({url: `${ API_URL }/offers/${ id }`, json: true});
+    const { id } = req.params;
+    const offersResult = await request.get({
+      url: `${API_URL}/offers/${id}`,
+      json: true,
+    });
 
     if (offersResult.statusCode === HttpCode.NOT_FOUND) {
       return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
     }
 
-    const categoriesResult = await request.get({url: `${ API_URL }/category`, json: true});
+    const categoriesResult = await request.get({
+      url: `${API_URL}/category`,
+      json: true,
+    });
 
     if (categoriesResult.statusCode === HttpCode.NOT_FOUND) {
       return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
     }
 
-    return res.render(`offers/ticket-edit`, {offer: offersResult.body, categories: categoriesResult.body});
+    return res.render(`offers/ticket-edit`, {
+      offer: offersResult.body,
+      categories: categoriesResult.body,
+    });
   } catch (error) {
     return next(error);
   }
@@ -79,8 +113,17 @@ exports.getPostEdit = async (req, res, next) => {
 
 exports.putPostEdit = async (req, res, next) => {
   try {
-    const {id} = req.params;
-    const {avatar, title, description, category, sum, type} = req.body;
+    const categoriesResult = await request.get({
+      url: `${API_URL}/category`,
+      json: true,
+    });
+
+    if (categoriesResult.statusCode === HttpCode.NOT_FOUND) {
+      return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
+    }
+
+    const { id } = req.params;
+    const { avatar, title, description, category, sum, type } = req.body;
 
     const offerCategories = Array.isArray(category) ? category : [category];
 
@@ -93,19 +136,35 @@ exports.putPostEdit = async (req, res, next) => {
       sum,
     };
 
-    const updatedOffer = await request.put({url: `${ API_URL }/offers/${ id }`, json: true, body: offer});
+    const updatedOffer = await request.put({
+      url: `${API_URL}/offers/${id}`,
+      json: true,
+      body: offer,
+    });
+
+    if (updatedOffer.statusCode === HttpCode.OK) {
+      return res.redirect(`/offers/${id}`);
+    }
 
     if (updatedOffer.statusCode === HttpCode.INTERNAL_SERVER_ERROR) {
       return res.status(HttpCode.INTERNAL_SERVER_ERROR).render(`errors/500`);
     }
 
-    const categoriesResult = await request.get({url: `${ API_URL }/category`, json: true});
+    // if (updatedOffer.statusCode === HttpCode.UNPROCESSABLE_ENTITY) {
+    //   const errorsArr = updatedOffer.body;
+    //   console.log(errorsArr);
+    //   console.log(categoriesResult.body);
+    //   return res.render(`offers/ticket-edit`,{offer,categories: categoriesResult.body,errorsArr});
+    // }
 
-    if (categoriesResult.statusCode === HttpCode.NOT_FOUND) {
-      return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
-    }
+    return res.render(`offers/ticket-edit`, {
+      categories: categoriesResult.body,
+      offer,
+      errorsArr: updatedOffer.body,
+    });
 
-    return res.render(`offers/ticket`,{offer: updatedOffer.body, categories: categoriesResult.body});
+    /* TODO: настроить страницу вывода конкретного предложения! */
+    /* TODO: переделать - id не показывает */
   } catch (error) {
     return next(error);
   }

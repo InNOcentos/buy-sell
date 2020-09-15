@@ -78,7 +78,7 @@ class OfferService {
     const { Offer, Category, User } = this._models;
 
     try {
-      /* TODO: переработать генерацию id */
+      /* TODO: переработать генерацию id (не обязательно)*/
       const user = await User.findByPk(4);
       const lastId = await Offer.findAll({
         limit: 1,

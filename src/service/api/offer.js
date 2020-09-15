@@ -5,7 +5,8 @@ const {Router} = require(`express`);
 const {HttpCode} = require(`../../constants`);
 const {isOfferExists} = require(`../middlewares/is-offer-exists`);
 const {isRequestDataValid} = require(`../middlewares/is-request-data-valid`);
-
+const offerValidator = require("../middlewares/offer-validator");
+const offerSchema = require('../schemas/offer');
 const route = new Router();
 
 const EXPECTED_PROPERTIES = [`category`, `description`, `title`, `type`, `sum`];
@@ -29,7 +30,7 @@ module.exports = (app, offerService, commentService) => {
     }
   });
 
-  route.post('/', isRequestDataValidMiddleware, async (req, res, next) => {
+  route.post('/', offerValidator(offerSchema), async (req, res, next) => {
     const {category, description, picture, title, type, sum} = req.body;
 
     try {
@@ -54,7 +55,7 @@ module.exports = (app, offerService, commentService) => {
     }
   });
 
-  route.put(`/:offerId`, [isOfferExistsMiddleware, isRequestDataValidMiddleware], async (req, res, next) => {
+  route.put(`/:offerId`, offerValidator(offerSchema), async (req, res, next) => {
     const {offerId} = req.params;
     const {category, description, picture, title, type, sum} = req.body;
     console.log({category, description, picture, title, type, sum})
