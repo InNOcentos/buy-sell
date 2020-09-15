@@ -1,13 +1,15 @@
 const multer = require("multer");
+const path = require('path');
 
 const fileName = {};
 const storage = multer.diskStorage({
     destination: function (req, file, next) {
-      next(null, `src/express/uploads/`);
+      next(null, path.resolve(__dirname,`../public/img/`));
     },
     filename: function (req, file, next) {
+        console.log(file);
         fileName.name = file;
-        next(null,file.fieldname + '.jpg');
+        next(null,file.originalname);
     },
 });
 const uploadFile = multer({ storage: storage }).single(`avatar`);

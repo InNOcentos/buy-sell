@@ -11,7 +11,7 @@ offersRouter.get(`/add`, getAddPost);
 offersRouter.post(`/add`, uploadFile, postAddPost);
 
 offersRouter.get(`/edit/:id`, getPostEdit);
-offersRouter.post(`/edit/:id`, putPostEdit);
+offersRouter.post(`/edit/:id`, uploadFile, putPostEdit);
 
 offersRouter.get(`/:id`, (req, res) => res.render(`offers/ticket`));
 
