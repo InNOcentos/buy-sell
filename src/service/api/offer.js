@@ -46,9 +46,9 @@ module.exports = (app, offerService, commentService) => {
     const {offerId} = req.params;
 
     try {
-      const offer = await offerService.findById(offerId);
+      const offerData= await offerService.findById(offerId);
 
-      res.status(HttpCode.OK).json(offer);
+      res.status(HttpCode.OK).json(offerData);
     } catch (error) {
       console.log(error.message)
       next(error);

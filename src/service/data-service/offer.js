@@ -28,6 +28,8 @@ class OfferService {
           sequelize.fn(`ARRAY_AGG`, sequelize.col(`categories.title`)),
           `category`,
         ],
+        `createdDate`,
+        `userId`
       ],
       group: [
         `offer.id`,
@@ -118,7 +120,7 @@ class OfferService {
   async isExists(id) {
     const { Offer } = this._models;
     const offerId = Number.parseInt(id, 10);
-
+    /* TODO: проверить для чего этот метод */
     try {
       const offer = await Offer.findByPk(offerId);
 
@@ -131,11 +133,30 @@ class OfferService {
   }
 
   async findById(id) {
-    const { Offer } = this._models;
+    const { Offer, Category, User} = this._models;
     const offerId = Number.parseInt(id, 10);
 
     try {
-      return await Offer.findByPk(offerId, this._selectOptions);
+      const offer = await Offer.findByPk(offerId, this._selectOptions);
+      const user = await User.findByPk(offer.userId, {
+        attributes: [
+          `firstName`,
+          `lastName`,
+          `email`,
+          `avatar`
+        ],
+      });
+      /* TODO: возможно рефакторинг выборки, получаем лишнее поле */
+      const categoriesIds = await Offer.findByPk(offerId, {
+        include: {
+          model: Category,
+          attributes: [
+            `id`
+          ],
+        },
+        attributes: [],
+      })
+      return {offer,user,categoriesIds};
     } catch (error) {
       console.error(`Can't find offer. Error: ${error}`);
 

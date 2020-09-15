@@ -24,7 +24,6 @@ exports.getAddPost = async (req, res, next) => {
 
 exports.postAddPost = async (req, res, next) => {
   try {
-
     const categoriesResult = await request.get({
       url: `${API_URL}/category`,
       json: true,
@@ -68,7 +67,6 @@ exports.postAddPost = async (req, res, next) => {
       });
     }
 
-    
     /* TODO: настроить вывод фото и категорий при ошибке валидации формы */
 
     return res.render(`offers/new-ticket`, {
@@ -165,6 +163,27 @@ exports.putPostEdit = async (req, res, next) => {
 
     /* TODO: настроить страницу вывода конкретного предложения! */
     /* TODO: переделать - id не показывает */
+  } catch (error) {
+    return next(error);
+  }
+};
+
+exports.get_offerById = async (req, res, next) => {
+  try {
+
+    const { id } = req.params;
+
+    const { statusCode, body } = await request.get({
+      url: `${API_URL}/offers/${ id }`,
+      json: true
+    });
+
+    if (statusCode === HttpCode.NOT_FOUND) {
+      return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
+    }
+
+    return res.render(`offers/ticket`, { offer: body.offer, user: body.user, categories: body.categoriesIds.categories});
+
   } catch (error) {
     return next(error);
   }
