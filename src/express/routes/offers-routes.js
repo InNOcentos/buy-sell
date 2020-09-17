@@ -1,7 +1,7 @@
 'use strict';
 
 const {Router} = require('express');
-const {getAddPost, postAddPost, getPostEdit,putPostEdit,get_offerById} = require(`../controllers/offers-controllers`);
+const {getAddPost, postAddPost, getPostEdit,putPostEdit,get_offerById, post_commentById} = require(`../controllers/offers-controllers`);
 const uploadFile = require('../multer');
 const offersRouter = new Router();
 
@@ -14,5 +14,6 @@ offersRouter.get(`/edit/:id`, getPostEdit);
 offersRouter.post(`/edit/:id`, uploadFile, putPostEdit);
 
 offersRouter.get(`/:id`, get_offerById);
+offersRouter.post(`/:id`, post_commentById);
 
 module.exports = offersRouter;

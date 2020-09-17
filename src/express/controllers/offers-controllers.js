@@ -1,9 +1,7 @@
 "use strict";
 
 const { request } = require(`../request`);
-const { HttpCode } = require(`../../constants`);
-const { API_URL } = require(`../../constants`);
-const { chalk } = require("chalk");
+const { HttpCode,API_URL} = require(`../../constants`);
 
 exports.getAddPost = async (req, res, next) => {
   try {
@@ -170,21 +168,72 @@ exports.putPostEdit = async (req, res, next) => {
 
 exports.get_offerById = async (req, res, next) => {
   try {
-
     const { id } = req.params;
-
-    const { statusCode, body } = await request.get({
+    const offer = await request.get({
       url: `${API_URL}/offers/${ id }`,
-      json: true
+      json: true,
     });
 
-    if (statusCode === HttpCode.NOT_FOUND) {
+    if (offer.statusCode === HttpCode.NOT_FOUND) {
       return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
     }
 
-    return res.render(`offers/ticket`, { offer: body.offer, user: body.user, categories: body.categoriesIds.categories});
+    const comments = await request.get({
+      url: `${API_URL}/offers/${ id }/comments`,
+      json: true,
+    });
+
+    if (comments.statusCode === HttpCode.NOT_FOUND) {
+      return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
+    }
+
+    return res.render(`offers/ticket`, { offer: offer.body.offer, user: offer.body.user, categories: offer.body.categoriesIds.categories, comments: comments.body});
 
   } catch (error) {
     return next(error);
   }
 };
+
+exports.post_commentById = async (req,res,next) => {
+  try {
+    const { id } = req.params;
+    const { comment } = req.body;
+
+    const newComment = await request.post({
+      url: `${API_URL}/offers/${ id }/comments`,
+      json: true,
+      body: {comment}
+    });
+
+    if (newComment.statusCode === HttpCode.CREATED) {
+      return res.redirect(`/my/comments`);
+    }
+
+    if (newComment.statusCode === HttpCode.UNPROCESSABLE_ENTITY) {
+      console.log(newComment.body)
+    }
+
+    const offer = await request.get({
+      url: `${API_URL}/offers/${ id }`,
+      json: true,
+    });
+
+    if (offer.statusCode === HttpCode.NOT_FOUND) {
+      return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
+    }
+
+    const comments = await request.get({
+      url: `${API_URL}/offers/${ id }/comments`,
+      json: true,
+    });
+
+    if (comments.statusCode === HttpCode.NOT_FOUND) {
+      return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
+    }
+
+    return res.render(`offers/ticket`, { offer: offer.body.offer, user: offer.body.user, categories: offer.body.categoriesIds.categories, comments: comments.body, userComment: comment,errorsArr: newComment.body});
+  
+  } catch(error) {
+    return next(error);
+  }
+}

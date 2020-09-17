@@ -6,7 +6,9 @@ const {HttpCode} = require(`../../constants`);
 const {isOfferExists} = require(`../middlewares/is-offer-exists`);
 const {isRequestDataValid} = require(`../middlewares/is-request-data-valid`);
 const offerValidator = require("../middlewares/offer-validator");
+const commentValidator = require('../middlewares/comment-validator');
 const offerSchema = require('../schemas/offer');
+const commentSchema = require('../schemas/comment');
 const route = new Router();
 
 const EXPECTED_PROPERTIES = [`category`, `description`, `title`, `type`, `sum`];
@@ -91,12 +93,12 @@ module.exports = (app, offerService, commentService) => {
     }
   });
 
-  route.post(`/:offerId/comments`, isRequestDataValidMiddlewareComments, async (req, res, next) => {
+  route.post(`/:offerId/comments`,commentValidator(commentSchema), async (req, res, next) => {
     const {offerId} = req.params;
-    const {text} = req.body;
+    const {comment} = req.body;
 
     try {
-      const newComment = await commentService.create(offerId, text);
+      const newComment = await commentService.create(offerId, comment);
 
       res.status(HttpCode.CREATED).json(newComment);
     } catch (error) {

@@ -3,25 +3,34 @@
 class CommentService {
   constructor(dataBase) {
     const {models} = dataBase;
+    const {User} = models;
     this._dataBase = dataBase;
     this._models = models;
     this._selectOptions = {
-      raw: true,
       attributes: [
         `id`,
         `message`,
-        `createdDate`,
+        `createdDate`
       ],
+      include: {
+        model: User,
+        as: 'user',
+        attributes: [
+          `avatar`,
+          `firstName`,
+          `lastName`,
+        ]
+      }
     };
   }
 
   async findAll(offerId) {
-    const {Offer} = this._models;
+    const {Offer, User} = this._models;
 
     try {
       const offer = await Offer.findByPk(offerId);
-
-      return await offer.getComments(this._selectOptions);
+      const comments =  await offer.getComments(this._selectOptions);
+      return comments;
     } catch (error) {
       console.error(`Can't find comments for offer with id ${ offerId }. Error: ${ error }`);
 
@@ -30,17 +39,32 @@ class CommentService {
   }
 
   async create(offerId, text) {
-    const {Offer, Comment} = this._models;
+    const {Offer, Comment, User} = this._models;
 
     try {
       const offer = await Offer.findByPk(offerId);
-
-      const newComment = await offer.createComment({
+      const user = await User.findByPk(1,{
+        attributes: [
+          `avatar`,
+          `firstName`,
+          `lastName`,
+        ]
+      });
+      const lastId = await Comment.findAll({
+        limit: 1,
+        order: [ [ 'id', 'DESC' ]],
+        attributes: [
+          `id`
+        ]
+      });
+      const newId = Number.parseInt(lastId[0]['dataValues']['id'], 10) + 1;
+      const comment = await offer.createComment({
         message: text,
-        user_id: 1,
+        id: newId,
+        userId: 1
       });
 
-      return await Comment.findByPk(newComment.id,this._selectOptions);
+      return await Comment.findByPk(comment.id,this._selectOptions);
     } catch (error) {
       console.error(`Can't create comment for offer with id ${ offerId }. Error: ${ error }`);
 

@@ -41,35 +41,28 @@ block content
         .ticket__comments
           h2.ticket__subtitle Коментарии
           .ticket__comment-form
-            form.form.comment-form(action="#" method="post")
+            form.form.comment-form(action=`http://localhost:8080/offers/${offer.id}` method="post")
               .comment-form__header
                 a.comment-form__avatar.avatar(href="#")
                   img(src=`/img/` + user.avatar, alt="Аватар пользователя")
                 p.comment-form__author Вам слово
               .comment-form__field
                 .form__field
-                  textarea#comment-field.js-field(name="comment" cols="30" rows="10" maxlength="400" minlength="50") Нормальное вообще кресло! А как насч
+                  textarea#comment-field.js-field(name="comment" cols="30" rows="10")
                   label(for="comment-field") Текст комментария
-                  span Обязательное поле
+                  if errorsArr
+                    each errorObj in errorsArr
+                      if errorObj.path[0] == `comment`
+                        span(style="display: block !important;") #{errorObj.message}
               button.comment-form__button.btn.btn--white.js-button(type="submit" disabled="") Отправить
           .ticket__comments-list
             ul.comments-list
-              li
-                .comment-card
-                  .comment-card__header
-                    a.comment-card__avatar.avatar(href="#")
-                      img(src="/img/avatar02.jpg" srcset="/img/avatar02@2x.jpg 2x" alt="Аватар пользователя")
-                    p.comment-card__author Георгий Шпиц
-                  .comment-card__content
-                    p Что это за рухлядь? Стыдно такое даже фотографировать, не то, что продавать.
-              li
-                .comment-card
-                  .comment-card__header
-                    a.comment-card__avatar.avatar(href="#")
-                      img(src="/img/avatar03.jpg" srcset="/img/avatar03@2x.jpg 2x" alt="Аватар пользователя")
-                    p.comment-card__author Александр Бурый
-                  .comment-card__content
-                    p
-                      | А можете доставить мне домой? Готов доплатить 300 сверху.
-                      br
-                      | Живу в центре прямо рядом с Моховой улицей. Готов купить прямо сейчас. Мой телефон 9032594748
+              each comment in comments
+                li
+                  .comment-card
+                    .comment-card__header
+                      a.comment-card__avatar.avatar(href="#")
+                        img(src=`/img/` + comment.user.avatar,alt="Аватар пользователя")
+                      p.comment-card__author #{comment.user.firstName} #{comment.user.lastName}
+                    .comment-card__content
+                      p #{comment.message}

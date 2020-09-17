@@ -6,6 +6,7 @@ const { API_URL } = require(`../../constants`);
 const { createPaginationPages } = require(`./utils`);
 const REQUIRED_NUMBER_OF_OFFERS = 3;
 const OFFERS_LIMIT_QUANTITY_ON_PAGE = 8;
+const OFFERS_COMMENTS_LIMIT_QUANTITY_ON_PAGE = 5;
 const DEFAULT_PAGE = 1;
 
 exports.getMyPage = async (req, res, next) => {
@@ -38,11 +39,10 @@ exports.getMyPage = async (req, res, next) => {
 
 exports.getMyComments = async (req, res, next) => {
   try {
-    const {statusCode, body} = await request.get({url: `${ API_URL }/offers`, json: true});
+    const {statusCode, body} = await request.get({url: `${ API_URL }/offers?limit=${ OFFERS_COMMENTS_LIMIT_QUANTITY_ON_PAGE}`, json: true});
     const offers = statusCode === HttpCode.OK ? body.offers : [];
-    const userOffers = offers.slice(0, REQUIRED_NUMBER_OF_OFFERS);
 
-    const userOffersIds = userOffers.map(({id}) => id);
+    const userOffersIds = offers.map(({id}) => id);
     const commentRequests = userOffersIds.map((id) => request.get({
       url: `http://localhost:3000/api/offers/${ id }/comments`,
       json: true,
@@ -50,7 +50,36 @@ exports.getMyComments = async (req, res, next) => {
     const commentResponses = await Promise.all(commentRequests);
     const userComments = commentResponses.map(({statusCode: commentsStatusCode, body: commentsBody}) => commentsStatusCode === HttpCode.OK ? commentsBody : []);
 
-    res.render(`comments`, {offers: userOffers, userComments});
+    res.render(`comments`, {offers: offers, userComments});
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.postMyPage = async (req, res, next) => {
+  try {
+    const { offerId  } = req.body;
+    const deletedOffer =  await request.delete({url: `${ API_URL }/offers/${ offerId }`, json: true});
+
+    if (deletedOffer.statusCode === HttpCode.OK) {
+      return res.redirect(`/my`);
+    }
+    return res.render(`errors/500`);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.postMyComments = async (req, res, next) => {
+  try {
+    const { offerId  } = req.body;
+    const { commentId  } = req.body;
+    const deletedComment =  await request.delete({url: `${ API_URL }/offers/${ offerId }/comments/${ commentId }`, json: true});
+
+    if (deletedComment.statusCode === HttpCode.OK) {
+      return res.redirect(`/my/comments`);
+    }
+    return res.render(`errors/500`);
   } catch (error) {
     next(error);
   }
