@@ -79,17 +79,17 @@ exports.get_signUpPage = async (req, res, next) => {
 exports.post_signUpPage = async (req, res, next) => {
   try {
     const { user_name, user_email, user_password, avatar, user_password_repeat } = req.body;
-    // const userFullName = user_name.split(" ") || [user_name];
+    const userFullName = user_name.split(` `) || [userFullName];
 
     const userData = {
-      firstName: user_name,
-      lastName: user_name,
+      firstName: userFullName[0],
+      lastName: userFullName[1],
       email: user_email,
       password: user_password,
       avatar: avatar,
       repeat: user_password_repeat,
     };
-
+    console.log(userData)
     const user = await request.post({
       url: `${API_URL}/user`,
       json: true,
@@ -100,11 +100,10 @@ exports.post_signUpPage = async (req, res, next) => {
       return res.redirect(`/login`);
     }
 
-    // if (user.statusCode === HttpCode.UNPROCESSABLE_ENTITY) {
-    //   return res.render(`sign-up`,{userData: {name: [user.body.firstName,user.body.lastName],email: user.body.email, avatar: user.body.avatar},errorsArr: user.body});
-    // }
+    if (!!!userData.lastName) userData.lastName = '';
+
     console.log(userData);
-    return res.render(`sign-up`,{userData: {name: [userData.firstName,userData.lastName],email: userData.email, avatar: userData.avatar},errorsArr: user.body.details});
+    return res.render(`sign-up`,{userData: {name: [userData.firstName,userData.lastName],email: userData.email, avatar: userData.avatar},errorsArr: user.body.details, alreadyExists: user.body.alreadyExists});
 
   } catch (error) {
     next(error);

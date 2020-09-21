@@ -120,7 +120,6 @@ class OfferService {
   async isExists(id) {
     const { Offer } = this._models;
     const offerId = Number.parseInt(id, 10);
-    /* TODO: проверить для чего этот метод */
     try {
       const offer = await Offer.findByPk(offerId);
 

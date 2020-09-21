@@ -2,7 +2,7 @@
 
 const {HttpCode} = require(`../../constants`);
 
-const isOfferExists = ({service}) => async (req, res, next) => {
+module.exports = ({service}) => async (req, res, next) => {
   const {offerId} = req.params;
 
   try {
@@ -19,5 +19,3 @@ const isOfferExists = ({service}) => async (req, res, next) => {
 
   return next();
 };
-
-exports.isOfferExists = isOfferExists;

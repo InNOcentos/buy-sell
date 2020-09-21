@@ -11,8 +11,10 @@ module.exports = Joi.object({
   lastName: Joi.string().min(1).max(50).required().messages({
     "string.max": registerMessage.MAX_LASTNAME_LENGTH,
     "any.required": registerMessage.EMPTY_SECONDNAME_VALUE,
+    "string.empty": registerMessage.EMPTY_SECONDNAME_VALUE,
   }),
   email: Joi.string().email().required().messages({
+    "string.email" : registerMessage.EMAIL_UNVALID,
     "any.required": registerMessage.EMPTY_VALUE,
   }),
   password: Joi.string().min(6).max(12).required().messages({

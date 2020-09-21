@@ -1,4 +1,6 @@
 'use strict';
+const bcrypt = require(`bcrypt`);
+const saltRounds = 10; 
 
 class UserService {
     constructor(dataBase) {
@@ -10,6 +12,7 @@ class UserService {
     async add({firstName, lastName, email, password, avatar}) {
         try {
             const { User } = this._models;
+            const hash = await bcrypt.hash(password, saltRounds);
             const lastId = await User.findAll({
                 limit: 1,
                 order: [ [ 'id', 'DESC' ]],
@@ -18,12 +21,13 @@ class UserService {
                 ]
               });
             const newId = Number.parseInt(lastId[0]['dataValues']['id'], 10) + 1;
+            /* TODO: исправить доабавление id */
             const newUser = await User.create({
                 id: newId,
                 firstName,
                 lastName,
                 email,
-                password,
+                password: hash,
                 avatar
             });
             return newUser;
@@ -31,6 +35,28 @@ class UserService {
             console.error(`Can't create new user. Error: ${error}`);
             return false;
         }
+    }
+    async isExists(email) {
+        const { User } = this._models;
+        const userEmail = email.trim();
+        try {
+          const user = await User.findOne({
+              where: {
+                  email: userEmail
+              }
+          });
+          if (user) {
+            return true;
+          }
+          return false;
+        } catch (error) {
+          console.error(`Can't check existence of user. Error: ${error}`);
+    
+          return false;
+        }
+    }
+    async checkUser(email,password) {
+
     }
 }
 

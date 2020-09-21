@@ -49,5 +49,7 @@ module.exports.registerMessage = {
   MAX_PASSWORD_LENGTH: `Пароль должен быть не больше 12 символов`,
   MAX_FRISTNAME_LENGTH: `Имя не должно содержать более 50 символов`,
   MAX_LASTNAME_LENGTH: `Фамилия не должна содержать более 50 символов`,
-  PASSWORDS_NOT_EQUALS: `Введенные пароли не совпадают`
+  PASSWORDS_NOT_EQUALS: `Введенные пароли не совпадают`,
+  EMAIL_ALREADY_EXISTS: `Пользователь с таким email уже зарегистрирован`,
+  EMAIL_UNVALID: `Введите корректный email`
 }

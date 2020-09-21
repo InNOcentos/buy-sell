@@ -3,20 +3,11 @@
 const {Router} = require(`express`);
 
 const {HttpCode} = require(`../../constants`);
-const {isOfferExists} = require(`../middlewares/is-offer-exists`);
-const {isRequestDataValid} = require(`../middlewares/is-request-data-valid`);
-const offerValidator = require("../middlewares/offer-validator");
-const commentValidator = require('../middlewares/comment-validator');
-const offerSchema = require('../schemas/offer');
-const commentSchema = require('../schemas/comment');
+const {isOfferExists,offerValidator,commentValidator} = require('../middlewares')
+const {offerSchema,commentSchema} = require(`../schemas`);
 const route = new Router();
 
-const EXPECTED_PROPERTIES = [`category`, `description`, `title`, `type`, `sum`];
-const EXPECTED_PROPERTIES_COMMENTS = [`text`];
-
 module.exports = (app, offerService, commentService) => {
-  const isRequestDataValidMiddleware = isRequestDataValid({expectedProperties: EXPECTED_PROPERTIES});
-  const isRequestDataValidMiddlewareComments = isRequestDataValid({expectedProperties: EXPECTED_PROPERTIES_COMMENTS});
   const isOfferExistsMiddleware = isOfferExists({service: offerService});
 
   app.use(`/offers`, route);
