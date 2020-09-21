@@ -11,7 +11,7 @@ Thumbs.db
 *.log*
 node_modules/
 *.env
-
+*.http
 # Папка с собранными файлами проекта
 build/
 

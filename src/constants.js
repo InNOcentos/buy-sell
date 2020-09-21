@@ -34,3 +34,20 @@ module.exports.offerCreateMessage = {
   EMPTY_PICTURE_VALUE: `Изображение предмета сделки отсутствует`,
   EMPTY_VALUE: `Поле обязательно для заполнения`,
 }
+module.exports.LoginMessage = {
+  USER_NOT_EXISTS: `Пользователь с таким email не зарегистрирован`,
+  WRONG_PASSWORD: `Неправильно введён логин или пароль`,
+  WRONG_EMAIL: `Неправильный email`,
+  REQUIRED_FIELD: `Поле обязательно для заполнения`,
+}
+
+module.exports.registerMessage = {
+  EMPTY_FIRSTNAME_VALUE: `Введите имя`,
+  EMPTY_SECONDNAME_VALUE: `Введите фамилию`,
+  EMPTY_VALUE: `Поле обязательно для заполнения`,
+  MIN_PASSWORD_LENGTH: `Пароль должен быть не меньше 6 символов`,
+  MAX_PASSWORD_LENGTH: `Пароль должен быть не больше 12 символов`,
+  MAX_FRISTNAME_LENGTH: `Имя не должно содержать более 50 символов`,
+  MAX_LASTNAME_LENGTH: `Фамилия не должна содержать более 50 символов`,
+  PASSWORDS_NOT_EQUALS: `Введенные пароли не совпадают`
+}

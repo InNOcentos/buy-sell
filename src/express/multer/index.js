@@ -12,15 +12,26 @@ const storage = multer.diskStorage({
         next(null,file.originalname);
     },
 });
-const uploadFile = multer({ storage: storage }).single(`avatar`);
+const upload = multer({ storage: storage }).single(`avatar`);
 
-module.exports = function(req,res,next) {
-    uploadFile(req,res,function (err) {
+exports.uploadFile = async (req,res,next) => {
+    
+    upload(req,res,function (err) {
         if (err) {
             console.log(err.message)
+        }
+        if (!fileName.name) {
+            next();
+            return;
         }
         req.body.avatar = fileName.name.originalname;
         next();
         
     })
 };
+exports.deleteFile = async (req,res,next) => {
+    if (fileName.name) {
+        delete fileName.name;
+    }
+    next();
+}

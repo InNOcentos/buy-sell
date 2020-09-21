@@ -2,12 +2,12 @@
 
 const {Router} = require('express');
 const {getAddPost, postAddPost, getPostEdit,putPostEdit,get_offerById, post_commentById} = require(`../controllers/offers-controllers`);
-const uploadFile = require('../multer');
+const {uploadFile, deleteFile} = require('../multer');
 const offersRouter = new Router();
 
 offersRouter.get(`/category/:id`, (req, res) => res.render(`category`)); // TODO: заменить с search
 
-offersRouter.get(`/add`, getAddPost);
+offersRouter.get(`/add`,deleteFile, getAddPost);
 offersRouter.post(`/add`, uploadFile, postAddPost);
 
 offersRouter.get(`/edit/:id`, getPostEdit);

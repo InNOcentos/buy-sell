@@ -99,7 +99,7 @@ exports.getPostEdit = async (req, res, next) => {
     }
 
     return res.render(`offers/ticket-edit`, {
-      offer: offersResult.body,
+      offer: offersResult.body.offer,
       categories: categoriesResult.body,
     });
   } catch (error) {
@@ -109,6 +109,7 @@ exports.getPostEdit = async (req, res, next) => {
 
 exports.putPostEdit = async (req, res, next) => {
   try {
+    console.log(req.body)
     const categoriesResult = await request.get({
       url: `${API_URL}/category`,
       json: true,
@@ -152,7 +153,6 @@ exports.putPostEdit = async (req, res, next) => {
     //   console.log(categoriesResult.body);
     //   return res.render(`offers/ticket-edit`,{offer,categories: categoriesResult.body,errorsArr});
     // }
-
     return res.render(`offers/ticket-edit`, {
       categories: categoriesResult.body,
       offer,

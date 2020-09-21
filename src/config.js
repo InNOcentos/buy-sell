@@ -16,5 +16,7 @@ module.exports = {
     db_name: process.env.DB_NAME,
     db_user_name: process.env.DB_USER_NAME,
     db_user_password: process.env.DB_USER_PASSWORD,
-    db_dialect: process.env.DB_DIALECT
+    db_dialect: process.env.DB_DIALECT,
+    jwt_access_secret: process.env.JWT_ACCESS_SECRET,
+    jwt_refresh_secret: process.env.JWT_REFRESH_SECRET,
 }

@@ -7,6 +7,7 @@ const config = require('../../config');
 const sequelize = new Sequelize(config.db_name,config.db_user_name,config.db_user_password, {
     host: config.db_host,
     dialect: config.db_dialect,
+    logging: false
 });
 
 const Category = require(path.join(__dirname,'./models/category'))(sequelize,Sequelize.DataTypes);
