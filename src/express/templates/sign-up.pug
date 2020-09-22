@@ -42,7 +42,7 @@ block content
               each errorObj in errorsArr
                 if errorObj.path[0] == `email`
                   div #{errorObj.message}
-            if alreadyExists
+            if userAlreadyExist
               div #{alreadyExists}
           .form__field.sign-up__field
             input#user-password.js-field(type="password" name="user_password")

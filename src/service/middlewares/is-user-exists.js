@@ -9,7 +9,7 @@ module.exports = ({service}) => async (req, res, next) => {
     const isExists = await service.isExists(email);
     
     if (isExists) {
-      res.status(HttpCode.NOT_FOUND).json({alreadyExists: registerMessage.EMAIL_ALREADY_EXISTS});
+      res.status(HttpCode.NOT_FOUND).json({userAlreadyExist: registerMessage.EMAIL_ALREADY_EXIST});
 
       return console.error(`User with this email is already registerd: ${ email }.`);
     }

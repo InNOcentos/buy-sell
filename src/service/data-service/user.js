@@ -45,18 +45,23 @@ class UserService {
                   email: userEmail
               }
           });
-          if (user) {
-            return true;
-          }
-          return false;
+          return user;
         } catch (error) {
           console.error(`Can't check existence of user. Error: ${error}`);
     
-          return false;
+          return null;
         }
     }
-    async checkUser(email,password) {
+    async checkUser(user,password) {
+      try {
+        const match = await bcrypt.compare(password, user.dataValues.password);
 
+        return match;
+      } catch (error) {
+        console.error(`Can't autheticate user. Error: ${error}`);
+
+        return null;
+      }
     }
 }
 

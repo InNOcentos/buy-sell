@@ -73,7 +73,11 @@ exports.getSearch = async (req, res, next) => {
 };
 
 exports.get_signUpPage = async (req, res, next) => {
-  res.render(`sign-up`);
+  try {
+    res.render(`sign-up`);
+  } catch (error) {
+    next(error);
+  }
 };
 
 exports.post_signUpPage = async (req, res, next) => {
@@ -89,9 +93,9 @@ exports.post_signUpPage = async (req, res, next) => {
       avatar: avatar,
       repeat: user_password_repeat,
     };
-    console.log(userData)
+
     const user = await request.post({
-      url: `${API_URL}/user`,
+      url: `${API_URL}/user/register`,
       json: true,
       body: userData,
     });
@@ -103,9 +107,40 @@ exports.post_signUpPage = async (req, res, next) => {
     if (!!!userData.lastName) userData.lastName = '';
 
     console.log(userData);
-    return res.render(`sign-up`,{userData: {name: [userData.firstName,userData.lastName],email: userData.email, avatar: userData.avatar},errorsArr: user.body.details, alreadyExists: user.body.alreadyExists});
+    return res.render(`sign-up`,{userData: {name: [userData.firstName,userData.lastName],email: userData.email, avatar: userData.avatar},errorsArr: user.body.details, userAlreadyExist: user.body.alreadyExists});
 
   } catch (error) {
     next(error);
   }
 };
+
+exports.getLoginPage = (req,res,next) => {
+  try {
+    res.render(`login`);
+  } catch (error) {
+    next(error);
+  }
+}
+
+exports.postLoginPage = async (req,res,next) => {
+  try {
+
+    const {user_email, user_password} = req.body;
+    const userData = {
+      email: user_email,
+      password: user_password
+    }
+
+    const user = await request.post({
+      url: `${API_URL}/user/login`,
+      json: true,
+      body: userData,
+    });
+    if (user.statusCode === HttpCode.OK) return res.redirect(`/`);
+
+    return res.render('login',{errorsArr: user.body.details, userNotFound: user.body.userNotFound, userData: {email:userData.email}})
+
+  } catch (error) {
+    next(error);
+  }
+}

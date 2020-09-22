@@ -2,17 +2,18 @@
 
 const { Router } = require(`express`);
 const { HttpCode } = require(`../../constants`);
-const { userValidator, isUserExists } = require(`../middlewares`);
+const { userValidator, isUserExists, authenticate} = require(`../middlewares`);
 const { newUserSchema, userSchema } = require(`../schemas`);
 
 const route = new Router();
 
 module.exports = (app, userService, RefreshTokenService) => {
-  const isUserExistsMiddleware = isUserExists({ service: userService });
+  const isUserExistsMiddleware = isUserExists({ service: userService});
+  const authenticateMiddleware = authenticate({service: userService});
 
-  app.use(`/user`, route);
+  app.use('/user', route);
 
-  route.post("/",[userValidator(newUserSchema), isUserExistsMiddleware],
+  route.post('/register',[userValidator(newUserSchema), isUserExistsMiddleware],
     async (req, res, next) => {
       try {
         const { firstName, lastName, email, password, avatar } = req.body;
@@ -26,9 +27,18 @@ module.exports = (app, userService, RefreshTokenService) => {
         });
         res.status(HttpCode.CREATED).json(newUser);
       } catch (error) {
-        console.log(error);
+        
         next(error);
       }
     }
   );
+  route.post('/login',[userValidator(userSchema),authenticateMiddleware], async (req,res,next) => {
+    try {
+      return res.status(HttpCode.OK).json('123');
+    } catch (error) {
+      
+      next(error);
+    }
+  })
+
 };

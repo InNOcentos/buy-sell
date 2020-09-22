@@ -1,27 +1,27 @@
 'use strict';
 
-const {LoginMessage, HttpCode} = require(`../../constants`);
+const {loginMessage, HttpCode} = require(`../../constants`);
 
-module.exports = (store) => (
+module.exports = ({service}) => (
     async (req, res, next) => {
-        const { username, password } = req.body;
-        const existsUser = await store.findByEmail(username);
+        const {email, password} = req.body;
+        const existsUser = await service.isExists(email);
 
         if (!existsUser) {
             res.status(HttpCode.FORBIDDEN)
-                .json({ message: LoginMessage.USER_NOT_EXISTS});
+                .json({userNotFound: loginMessage.USER_NOT_EXIST});
 
             return;
         }
 
-        if (! await store.checkUser(existsUser, password)) {
+        if (! await service.checkUser(existsUser, password)) {
             res.status(HttpCode.FORBIDDEN)
-                .json({message: LoginMessage.WRONG_PASSWORD});
+                .json({userNotFound: loginMessage.USER_NOT_EXIST});
 
             return;
         }
-
-        res.locals.user = existsUser;
+        
+        res.locals.user = existsUser.dataValues;
         next();
     }
 );
