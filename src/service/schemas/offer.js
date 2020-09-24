@@ -11,7 +11,7 @@ module.exports = Joi.object({
   }),
   picture: Joi.string().required().messages({
     "string.required": offerCreateMessage.EMPTY_PICTURE_VALUE,
-  }), // TODO: разобраться с загрузкой фото и оно должно подгружаться сразу при загрузке страницы
+  }), 
   sum: Joi.number().min(1).max(1000000).required().messages({
     "number.min": offerCreateMessage.MIN_SUM_COUNT,
     "number.max": offerCreateMessage.MAX_SUM_COUNT,

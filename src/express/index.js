@@ -1,6 +1,7 @@
 'use strict';
 
 const express = require(`express`);
+const cookieParser = require(`cookie-parser`);
 
 const mainRoutes = require('./routes/main-routes');
 const offersRoutes = require('./routes/offers-routes');
@@ -9,6 +10,7 @@ const path = require(`path`);
 const PUBLIC_DIR = `public`;
 const DEFAULT_PORT = 8080;
 const app = express();
+app.use(cookieParser());
 
 app.set(`views`, path.resolve(__dirname, `templates`));
 app.set(`view engine`, `pug`);

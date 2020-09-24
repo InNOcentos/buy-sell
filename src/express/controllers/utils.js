@@ -1,6 +1,6 @@
 'use strict';
 
-exports.createPaginationPages = ({quantity, currentPage}) => {
+const createPaginationPages = ({quantity, currentPage}) => {
     const currentPageIndex = currentPage - 1;
     const hasPreviousPageLink = currentPageIndex !== 0;
     const hasNextPageLink = currentPageIndex !== quantity - 1;
@@ -38,4 +38,19 @@ exports.createPaginationPages = ({quantity, currentPage}) => {
     }
   
     return pages;
-  };
+};
+
+let userAccessToken = function(token) {
+  let _token = token;
+  this.get = function() {
+    return _token;
+  }
+  this.set = function(value){
+    this._token = value;
+  }
+}
+
+module.exports = {
+  userAccessToken,
+  createPaginationPages
+}

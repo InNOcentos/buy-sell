@@ -3,7 +3,7 @@
 const {Router} = require(`express`);
 
 const {HttpCode} = require(`../../constants`);
-const {isOfferExists,offerValidator,commentValidator} = require('../middlewares')
+const {isOfferExists,offerValidator,commentValidator, authenticateJwt} = require('../middlewares')
 const {offerSchema,commentSchema} = require(`../schemas`);
 const route = new Router();
 
@@ -30,6 +30,18 @@ module.exports = (app, offerService, commentService) => {
       const newOffer = await offerService.create({categories: category, description, picture, title, type, sum});
 
       res.status(HttpCode.CREATED).json(newOffer);
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+  route.get('/my', authenticateJwt, async (req, res, next) => {
+    try {
+      const { id } = res.locals.user;
+      const {offset, limit} = req.query;
+      const result = await offerService.findAllByUser({offset, limit, id});
+     
+      res.status(HttpCode.OK).json(result);
     } catch (error) {
       next(error);
     }

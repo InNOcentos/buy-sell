@@ -12,7 +12,6 @@ const {sequelize, initDb} = require('../data-base');
 const app = express();
 const DEFAULT_PORT = 3000;
 
-
 app.use(express.json());
 
 app.use(API_PREFIX, routes);

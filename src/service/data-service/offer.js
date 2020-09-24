@@ -68,6 +68,34 @@ class OfferService {
     }
   }
 
+  async findAllByUser({ offset, limit, id}) {
+    const { Offer} = this._models;
+
+    try {
+      const [quantity, offers] = await Promise.all([
+        Offer.count(),
+        Offer.findAll({
+          ...this._selectOptions,
+          offset,
+          limit,
+          subQuery: false,
+          where: {
+            userId: id
+          },
+        }),
+      ]);
+
+      return {
+        offers,
+        quantity,
+      };
+    } catch (error) {
+      console.error(`Can't findAll offers. Error: ${error}`);
+
+      return [];
+    }
+  }
+
   async create({
     categories: categoriesIds,
     description,
@@ -80,7 +108,7 @@ class OfferService {
     const { Offer, Category, User } = this._models;
 
     try {
-      /* TODO: переработать генерацию id (не обязательно)*/
+      
       const user = await User.findByPk(4);
       const lastId = await Offer.findAll({
         limit: 1,
@@ -145,7 +173,7 @@ class OfferService {
           `avatar`
         ],
       });
-      /* TODO: возможно рефакторинг выборки, получаем лишнее поле */
+      
       const categoriesIds = await Offer.findByPk(offerId, {
         include: {
           model: Category,
@@ -249,7 +277,7 @@ class OfferService {
         ...this._selectOptions,
         where: {
           title: {
-            [sequelize.Sequelize.Op.iLike]: `%${title}%`, // TODO: Не работает со строками на русском. Разобраться
+            [sequelize.Sequelize.Op.iLike]: `%${title}%`, 
           },
         },
       });
@@ -285,7 +313,7 @@ class OfferService {
          
         }
       });
-      /* TODO: вывод всех категорий */
+      /* 
      /*  const offersCategories = await Offer.findAll({
         ...this._selectOptions,
         attributes: [

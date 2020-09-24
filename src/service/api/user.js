@@ -2,8 +2,11 @@
 
 const { Router } = require(`express`);
 const { HttpCode } = require(`../../constants`);
-const { userValidator, isUserExists, authenticate} = require(`../middlewares`);
+const { userValidator, isUserExists, authenticate, authenticateJwt} = require(`../middlewares`);
 const { newUserSchema, userSchema } = require(`../schemas`);
+const { makeTokens } = require(`../helpers/jwt-helper`);
+const jwt = require(`jsonwebtoken`);
+const {jwt_refresh_secret} = require(`../../config`);
 
 const route = new Router();
 
@@ -12,6 +15,14 @@ module.exports = (app, userService, RefreshTokenService) => {
   const authenticateMiddleware = authenticate({service: userService});
 
   app.use('/user', route);
+
+  route.post('/',authenticateJwt, async (req,res,next)=> {
+    try {
+
+    } catch(error) {
+      next(error)
+    }
+  })
 
   route.post('/register',[userValidator(newUserSchema), isUserExistsMiddleware],
     async (req, res, next) => {
@@ -25,20 +36,74 @@ module.exports = (app, userService, RefreshTokenService) => {
           password,
           avatar,
         });
-        res.status(HttpCode.CREATED).json(newUser);
+        res.status(HttpCode.CREATED);
       } catch (error) {
         
         next(error);
       }
     }
   );
+  
   route.post('/login',[userValidator(userSchema),authenticateMiddleware], async (req,res,next) => {
     try {
-      return res.status(HttpCode.OK).json('123');
+
+      const {id,avatar} = res.locals.user;
+      const {accessToken, refreshToken}  = makeTokens({id,avatar});
+
+      await RefreshTokenService.add(refreshToken);
+
+      return res
+        .status(HttpCode.OK)
+        .json({accessToken,refreshToken,userData: {id,avatar}})
     } catch (error) {
       
       next(error);
     }
+  });
+  
+  route.post(`/refresh`, async (req, res, next) => {
+    try {
+      const token = req.headers['token'];
+      
+      if (!token) {
+          return res.sendStatus(HttpCode.BAD_REQUEST);
+      };
+  
+      const existToken = await RefreshTokenService.find(token);
+      
+      if (!existToken) {
+          return res.sendStatus(HttpCode.NOT_FOUND);
+      }
+  
+      jwt.verify(token, jwt_refresh_secret, async (err, userData) => {
+          if (err) {
+            
+              return res.sendStatus(HttpCode.FORBIDDEN);
+          }
+          
+          const {id,avatar} = userData;
+          const {accessToken, refreshToken}  = makeTokens({id,avatar});
+  
+          await RefreshTokenService.drop(existToken);
+          await RefreshTokenService.add(refreshToken);
+  
+          res.status(HttpCode.OK).json({accessToken, refreshToken,userData: {id,avatar}});
+      });
+    } catch (error) {
+      next(error);
+    }
+    
+  });
+
+  route.delete(`/logout`, authenticateJwt, (req, res, next) => {
+    try {
+      const token = res.locals.userToken;
+      RefreshTokenService.drop(token);
+      res.sendStatus(HttpCode.NO_CONTENT);
+    } catch (error) {
+      next(error);
+    }
+      
   })
 
 };

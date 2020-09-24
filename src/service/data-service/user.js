@@ -21,7 +21,7 @@ class UserService {
                 ]
               });
             const newId = Number.parseInt(lastId[0]['dataValues']['id'], 10) + 1;
-            /* TODO: исправить доабавление id */
+           
             const newUser = await User.create({
                 id: newId,
                 firstName,

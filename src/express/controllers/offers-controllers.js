@@ -5,6 +5,7 @@ const { HttpCode,API_URL} = require(`../../constants`);
 
 exports.getAddPost = async (req, res, next) => {
   try {
+    
     const { statusCode, body: categories } = await request.get({
       url: `${API_URL}/category`,
       json: true,
@@ -65,7 +66,7 @@ exports.postAddPost = async (req, res, next) => {
       });
     }
 
-    /* TODO: настроить вывод фото и категорий при ошибке валидации формы */
+    
 
     return res.render(`offers/new-ticket`, {
       categories: categoriesResult.body,
@@ -159,8 +160,7 @@ exports.putPostEdit = async (req, res, next) => {
       errorsArr: updatedOffer.body,
     });
 
-    /* TODO: настроить страницу вывода конкретного предложения! */
-    /* TODO: переделать - id не показывает */
+    
   } catch (error) {
     return next(error);
   }
