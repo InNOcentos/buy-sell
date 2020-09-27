@@ -22,10 +22,10 @@ block content
                       | Куплю
                   .ticket-card__categories
                     each category in offer.category
-                      a(href='#') #{category}
+                      a(href=`#`) #{category}
                   .ticket-card__header
                     h3.ticket-card__title
-                      a(href='#') #{offer.title}
+                      a(href=`/offers/${offer.id}`) #{offer.title}
                     p.ticket-card__price
                       span.js-sum #{offer.sum}
                       |  ₽

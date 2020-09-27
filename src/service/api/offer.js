@@ -14,22 +14,24 @@ module.exports = (app, offerService, commentService) => {
 
   route.get('/', async (req, res, next) => {
     try {
-      const {offset, limit} = req.query;
-      const result = await offerService.findAll({offset, limit});
+      const {limit} = req.query;
+      
+      const result = await offerService.findAll({limit});
 
-      res.status(HttpCode.OK).json(result);
+      return res.status(HttpCode.OK).json(result);
     } catch (error) {
       next(error);
     }
   });
 
-  route.post('/', offerValidator(offerSchema), async (req, res, next) => {
+  route.post('/', [offerValidator(offerSchema),authenticateJwt], async (req, res, next) => {
     const {category, description, picture, title, type, sum} = req.body;
+    const {id} = res.locals.user;
 
     try {
-      const newOffer = await offerService.create({categories: category, description, picture, title, type, sum});
+      const newOffer = await offerService.create({categories: category, description, picture, title, type, sum, id});
 
-      res.status(HttpCode.CREATED).json(newOffer);
+      return res.status(HttpCode.CREATED).json(newOffer);
     } catch (error) {
       next(error);
     }
@@ -41,7 +43,7 @@ module.exports = (app, offerService, commentService) => {
       const {offset, limit} = req.query;
       const result = await offerService.findAllByUser({offset, limit, id});
      
-      res.status(HttpCode.OK).json(result);
+      return res.status(HttpCode.OK).json(result);
     } catch (error) {
       next(error);
     }
@@ -53,33 +55,33 @@ module.exports = (app, offerService, commentService) => {
     try {
       const offerData= await offerService.findById(offerId);
 
-      res.status(HttpCode.OK).json(offerData);
+      return res.status(HttpCode.OK).json(offerData);
     } catch (error) {
       console.log(error.message)
       next(error);
     }
   });
 
-  route.put(`/:offerId`, offerValidator(offerSchema), async (req, res, next) => {
+  route.put(`/:offerId`,[offerValidator(offerSchema),authenticateJwt], async (req, res, next) => {
     const {offerId} = req.params;
     const {category, description, picture, title, type, sum} = req.body;
     console.log({category, description, picture, title, type, sum})
     try {
       const updatedOffer = await offerService.update({id: offerId, category, description, picture, title, type, sum});
 
-      res.status(HttpCode.OK).json(updatedOffer);
+      return res.status(HttpCode.OK).json(updatedOffer);
     } catch (error) {
       next(error);
     }
   });
 
-  route.delete(`/:offerId`, isOfferExistsMiddleware, async (req, res, next) => {
+  route.delete(`/:offerId`,[authenticateJwt,isOfferExistsMiddleware], async (req, res, next) => {
     const {offerId} = req.params;
 
     try {
       const deletedOffer = await offerService.delete(offerId);
 
-      res.status(HttpCode.OK).json(deletedOffer);
+      return res.status(HttpCode.OK).json(deletedOffer);
     } catch (error) {
       next(error);
     }
@@ -90,26 +92,27 @@ module.exports = (app, offerService, commentService) => {
     try {
       const comments = await commentService.findAll(offerId);
 
-      res.status(HttpCode.OK).json(comments);
+      return res.status(HttpCode.OK).json(comments);
     } catch (error) {
       next(error);
     }
   });
 
-  route.post(`/:offerId/comments`,commentValidator(commentSchema), async (req, res, next) => {
+  route.post(`/:offerId/comments`,[commentValidator(commentSchema),authenticateJwt], async (req, res, next) => {
     const {offerId} = req.params;
+    const {id: userId} = res.locals.user;
     const {comment} = req.body;
 
     try {
-      const newComment = await commentService.create(offerId, comment);
+      const newComment = await commentService.create(offerId, comment, userId);
 
-      res.status(HttpCode.CREATED).json(newComment);
+      return res.status(HttpCode.CREATED).json(newComment);
     } catch (error) {
       next(error);
     }
   });
 
-  route.delete(`/:offerId/comments/:commentId`, async (req, res) => {
+  route.delete(`/:offerId/comments/:commentId`,authenticateJwt, async (req, res) => {
     const {commentId} = req.params;
 
     try {

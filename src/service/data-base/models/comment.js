@@ -9,7 +9,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       createdAt: {
         field: `createdDate`,
-        type: DataTypes.DATEONLY,
+        type: DataTypes.DATE
       },
     }, {
       sequelize,

@@ -42,7 +42,7 @@ module.exports = (app, offerService) => {
     try {
       const offersByCategory = await offerService.findAllByCategory(categoryId);
 
-      res.status(HttpCode.OK).json(offersByCategory);
+      return res.status(HttpCode.OK).json(offersByCategory);
     } catch (error) {
       next(error);
     }

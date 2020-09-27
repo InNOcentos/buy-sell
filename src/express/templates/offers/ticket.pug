@@ -40,11 +40,12 @@ block content
                     span.category-tile__label #{offer.category[index]}
         .ticket__comments
           h2.ticket__subtitle Коментарии
-          .ticket__comment-form
+          if userData['id']
+            .ticket__comment-form
             form.form.comment-form(action=`http://localhost:8080/offers/${offer.id}` method="post")
               .comment-form__header
                 a.comment-form__avatar.avatar(href="#")
-                  img(src=`/img/` + user.avatar, alt="Аватар пользователя")
+                  img(src=`/img/` + userData.avatar, alt="Аватар пользователя")
                 p.comment-form__author Вам слово
               .comment-form__field
                 .form__field
@@ -55,6 +56,13 @@ block content
                       if errorObj.path[0] == `comment`
                         span(style="display: block !important;") #{errorObj.message}
               button.comment-form__button.btn.btn--white.js-button(type="submit" disabled="") Отправить
+          else 
+            .ticket__warning
+              p
+                | Отправка комментариев доступна 
+                br
+                | только для зарегистрированных пользователей.
+              a.btn.btn--big(href='/sign-up') Вход и регистрация
           .ticket__comments-list
             ul.comments-list
               each comment in comments

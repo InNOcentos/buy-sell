@@ -16,14 +16,6 @@ module.exports = (app, userService, RefreshTokenService) => {
 
   app.use('/user', route);
 
-  route.post('/',authenticateJwt, async (req,res,next)=> {
-    try {
-
-    } catch(error) {
-      next(error)
-    }
-  })
-
   route.post('/register',[userValidator(newUserSchema), isUserExistsMiddleware],
     async (req, res, next) => {
       try {
@@ -36,7 +28,7 @@ module.exports = (app, userService, RefreshTokenService) => {
           password,
           avatar,
         });
-        res.status(HttpCode.CREATED);
+        return res.status(HttpCode.CREATED).json(newUser);
       } catch (error) {
         
         next(error);
@@ -87,7 +79,7 @@ module.exports = (app, userService, RefreshTokenService) => {
           await RefreshTokenService.drop(existToken);
           await RefreshTokenService.add(refreshToken);
   
-          res.status(HttpCode.OK).json({accessToken, refreshToken,userData: {id,avatar}});
+          return res.status(HttpCode.OK).json({accessToken, refreshToken,userData: {id,avatar}});
       });
     } catch (error) {
       next(error);
@@ -99,7 +91,7 @@ module.exports = (app, userService, RefreshTokenService) => {
     try {
       const token = res.locals.userToken;
       RefreshTokenService.drop(token);
-      res.sendStatus(HttpCode.NO_CONTENT);
+      return res.sendStatus(HttpCode.NO_CONTENT);
     } catch (error) {
       next(error);
     }

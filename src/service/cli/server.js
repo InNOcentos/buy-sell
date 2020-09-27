@@ -35,8 +35,6 @@ module.exports = {
     }
 
     try {
-      await getMockData();
-
       app.listen(port, (err) => {
         if (err) {
           return logger.error(`Server can't start. Error: ${err}`);

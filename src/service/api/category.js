@@ -14,17 +14,7 @@ module.exports = (app, categortyService) => {
     try {
       const categories = await categortyService.findAll();
 
-      res.status(HttpCode.OK).json(categories);
-    } catch (error) {
-      console.log(error.message)
-    }
-  });
-
-  route.get(`/offer`, async (req, res, next) => {
-    try {
-      const categories = await categortyService.findAll();
-
-      res.status(HttpCode.OK).json(categories);
+      return res.status(HttpCode.OK).json(categories);
     } catch (error) {
       console.log(error.message)
     }

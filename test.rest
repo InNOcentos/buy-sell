@@ -9,6 +9,7 @@ authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImZpcnN0T
 
 PUT http://localhost:3000/api/offers/5
 Content-Type: application/json
+
 authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImlhdCI6MTYwMDgwMjY4OSwiZXhwIjoxNjAwODAyNzA5fQ.s7DNhTWds0K37vzSwoHv3xl7Hv-3L0SYJMUWebbgHLk
 
 {

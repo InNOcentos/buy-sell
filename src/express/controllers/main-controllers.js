@@ -2,53 +2,25 @@
 
 const { request } = require(`../request`);
 const { HttpCode, API_URL } = require(`../../constants`);
-const { userAccessToken } = require(`./utils`);
-const { getNewRefreshToken } = require("../helpers/jwt-helper");
+const { setUserCookie, clearUserCookie } = require(`../helpers/jwt-helper`);
 const OFFERS_LIMIT_QUANTITY_ON_PAGE = 8;
 
 exports.getHomePage = async (req, res, next) => {
-  /* if (!req.cookies.user_accessToken && req.cookies.user_refreshToken) {
-    const makeNewToken = await request.post({
+  let offers = [], categories = [];
+  if (!req.cookies.user_accessToken && req.cookies.user_refreshToken) {
+    const { statusCode, body } = await request.post({
       url: `${API_URL}/user/refresh`,
       json: true,
       headers: {
         token: `${req.cookies.user_refreshToken}`,
       },
     });
-    if (makeNewToken.statusCode === HttpCode.OK) {
-      const { accessToken, refreshToken, userData } = makeNewToken.body;
+    if (statusCode === HttpCode.OK) {
+      const { accessToken, refreshToken, userData } = body;
       const { id, avatar } = userData;
-      res
-        .cookie(`user_refreshToken`, `${refreshToken}`, { maxAge: 900000000 })
-        .cookie(`user_accessToken`, `${accessToken}`, { maxAge: 900000000 })
-        .cookie(`user_id`, `${id}`, { maxAge: 5000 })
-        .cookie(`user_avatar`, `${avatar}`, { maxAge: 900000000 });
-    }
-  } */
-
-  if (!req.cookies.user_accessToken) {
-    if (req.cookies.user_refreshToken) {
-      const makeNewToken = await request.post({
-        url: `${API_URL}/user/refresh`,
-        json: true,
-        headers: {
-          token: `${req.cookies.user_refreshToken}`,
-        },
-      });
-      if (makeNewToken.statusCode === HttpCode.OK) {
-        const { accessToken, refreshToken, userData } = makeNewToken.body;
-        const { id, avatar } = userData;
-        res
-          .cookie(`user_refreshToken`, `${refreshToken}`, { maxAge: 900000000 })
-          .cookie(`user_accessToken`, `${accessToken}`, { maxAge: 5000 })
-          .cookie(`user_id`, `${id}`, { maxAge: 900000000 })
-          .cookie(`user_avatar`, `${avatar}`, { maxAge: 900000000 });
-      }
+      setUserCookie(refreshToken, accessToken, id, avatar, res);
     }
   }
-
-  let offers = [],
-    categories = [];
 
   try {
     const { statusCode, body } = await request.get({
@@ -76,8 +48,7 @@ exports.getHomePage = async (req, res, next) => {
     next(error);
   }
 
-  
-/*   res.clearCookie('user_id')
+  /*   res.clearCookie('user_id')
     .clearCookie('user_avatar')
     .clearCookie('user_accessToken')
     .clearCookie('user_refreshToken').render(`main`, {
@@ -91,14 +62,15 @@ exports.getHomePage = async (req, res, next) => {
         avatar: req.cookies.user_avatar
       }
     });  */
- res.render(`main`, {
+
+  res.render(`main`, {
     offers,
     categories,
     userData: {
       id: req.cookies.user_id,
       avatar: req.cookies.user_avatar,
     },
-  }); 
+  });
 };
 
 exports.getSearch = async (req, res, next) => {
@@ -137,7 +109,12 @@ exports.getSearch = async (req, res, next) => {
 
 exports.get_signUpPage = async (req, res, next) => {
   try {
-    res.render(`sign-up`);
+    if (req.cookies.user_accessToken) return res.redirect('/');
+    res.render(`sign-up`, {userData: {
+      id: req.cookies.user_id,
+      avatar: req.cookies.user_avatar,
+    }
+  });
   } catch (error) {
     next(error);
   }
@@ -162,28 +139,29 @@ exports.post_signUpPage = async (req, res, next) => {
       avatar: avatar,
       repeat: user_password_repeat,
     };
-
-    const user = await request.post({
+    
+    if (!!!userData.lastName) userData.lastName = "";
+    
+    const { statusCode, body } = await request.post({
       url: `${API_URL}/user/register`,
       json: true,
       body: userData,
     });
 
-    if (user.statusCode === HttpCode.CREATED) {
+    if (statusCode === HttpCode.CREATED) {
       return res.redirect(`/login`);
     }
 
-    if (!!!userData.lastName) userData.lastName = "";
+    
 
-    console.log(userData);
     return res.render(`sign-up`, {
       userData: {
         name: [userData.firstName, userData.lastName],
         email: userData.email,
         avatar: userData.avatar,
       },
-      errorsArr: user.body.details,
-      userAlreadyExist: user.body.alreadyExists,
+      errorsArr: body.details,
+      userAlreadyExist: body.alreadyExists,
     });
   } catch (error) {
     next(error);
@@ -192,6 +170,7 @@ exports.post_signUpPage = async (req, res, next) => {
 
 exports.getLoginPage = (req, res, next) => {
   try {
+    if (req.cookies.user_accessToken) return res.redirect('/');
     res.render(`login`, {
       userData: {
         id: req.cookies.user_id,
@@ -214,27 +193,20 @@ exports.postLoginPage = async (req, res, next) => {
       password: user_password,
     };
 
-    const user = await request.post({
+    const { statusCode, body } = await request.post({
       url: `${API_URL}/user/login`,
       json: true,
       body: userData,
     });
-    if (user.statusCode === HttpCode.OK) {
-      const { accessToken, refreshToken, userData } = user.body;
+    if (statusCode === HttpCode.OK) {
+      const { accessToken, refreshToken, userData } = body;
       const { id, avatar } = userData;
 
-      res
-        .cookie(`user_refreshToken`, `${refreshToken}`, {
-          maxAge: 124234149563,
-        })
-        .cookie(`user_accessToken`, `${accessToken}`, { maxAge: 5000 })
-        .cookie(`user_id`, `${id}`, { maxAge: 3600000 })
-        .cookie(`user_avatar`, `${avatar}`, { maxAge: 3600000 })
-        .redirect("/");
+      setUserCookie(refreshToken, accessToken, id, avatar, res);
     }
     return res.render("login", {
-      errorsArr: user.body.details,
-      userNotFound: user.body.userNotFound,
+      errorsArr: body.details,
+      userNotFound: body.userNotFound,
       userData: { email: userData.email },
     });
   } catch (error) {
@@ -244,65 +216,48 @@ exports.postLoginPage = async (req, res, next) => {
 
 exports.getLogout = async (req, res, next) => {
   try {
+    if (!req.cookies.user_refreshToken) {
+      clearUserCookie(res);
+    }
     if (!req.cookies.user_accessToken && req.cookies.user_refreshToken) {
-      const makeNewToken = await request.post({
+      const { statusCode, body } = await request.post({
         url: `${API_URL}/user/refresh`,
         json: true,
         headers: {
           token: `${req.cookies.user_refreshToken}`,
         },
       });
-
-      if (makeNewToken.statusCode === HttpCode.OK) {
-        const { accessToken, refreshToken, userData } = makeNewToken.body;
-        const { id, avatar } = userData;
-        res
-          .cookie(`user_refreshToken`, `${refreshToken}`, { maxAge: 900000000 })
-          .cookie(`user_accessToken`, `${accessToken}`, { maxAge: 5000 })
-          .cookie(`user_id`, `${id}`, { maxAge: 900000000 })
-          .cookie(`user_avatar`, `${avatar}`, { maxAge: 900000000 });
-      }
-      res.redirect("/my");
-    }
-
-    /*  if (!req.cookies.user_accessToken) {
-      if (req.cookies.user_refreshToken) {
-        const makeNewToken = await request.post({
-          url: `${API_URL}/user/refresh`,
+      if (statusCode === HttpCode.OK) {
+        const { accessToken } = body;
+        const { statusCode } = await request.delete({
+          url: `${API_URL}/user/logout`,
           json: true,
           headers: {
-            token: `${req.cookies.user_refreshToken}`,
+            authorization: `Bearer ${accessToken}`,
           },
         });
-        if (makeNewToken.statusCode === HttpCode.OK) {
-          const { accessToken, refreshToken, userData } = makeNewToken.body;
-          const { id, avatar } = userData;
-          res
-            .cookie(`user_refreshToken`, `${refreshToken}`, { maxAge: 900000000 })
-            .cookie(`user_accessToken`, `${accessToken}`, { maxAge: 5000 })
+        if (statusCode === HttpCode.NO_CONTENT) {
+          clearUserCookie(res);
+        } else {
+          console.log(statusCode);
+          return res.redirect("back");
         }
-        
-      } else {
-        return res.redirect("/login");
       }
-    } */
-
-    const user = await request.delete({
+      console.log(statusCode);
+      return res.redirect("back");
+    }
+    const { statusCode } = await request.delete({
       url: `${API_URL}/user/logout`,
       json: true,
       headers: {
-        Authorization: `Bearer ${req.cookies.user_accessToken}`,
+        authorization: `Bearer ${req.cookies.user_accessToken}`,
       },
     });
-    if (user.statusCode === HttpCode.NO_CONTENT) {
-      return res
-        .clearCookie("user_accessToken")
-        .clearCookie("user_refreshToken")
-        .clearCookie("user_id")
-        .clearCookie("user_avatar")
-        .redirect("/");
+    if (statusCode === HttpCode.NO_CONTENT) {
+      clearUserCookie(res);
     } else {
-      console.log(user.statusCode);
+      console.log(statusCode);
+      return res.redirect("back");
     }
   } catch (error) {
     next(error);

@@ -40,17 +40,6 @@ const createPaginationPages = ({quantity, currentPage}) => {
     return pages;
 };
 
-let userAccessToken = function(token) {
-  let _token = token;
-  this.get = function() {
-    return _token;
-  }
-  this.set = function(value){
-    this._token = value;
-  }
-}
-
 module.exports = {
-  userAccessToken,
   createPaginationPages
 }

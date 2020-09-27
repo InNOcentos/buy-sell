@@ -2,10 +2,12 @@
 
 const { request } = require(`../request`);
 const { HttpCode,API_URL} = require(`../../constants`);
+const { setUserCookie, clearUserCookie, ifUserAuthorisedCheck } = require(`../helpers/jwt-helper`);
 
 exports.getAddPost = async (req, res, next) => {
   try {
-    
+    ifUserAuthorisedCheck(req,res,clearUserCookie,setUserCookie);
+
     const { statusCode, body: categories } = await request.get({
       url: `${API_URL}/category`,
       json: true,
@@ -15,7 +17,10 @@ exports.getAddPost = async (req, res, next) => {
       return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
     }
 
-    return res.render(`offers/new-ticket`, { categories });
+    return res.render(`offers/new-ticket`, { categories , userData: {
+      id: req.cookies.user_id,
+      avatar: req.cookies.user_avatar,
+    } });
   } catch (error) {
     return next(error);
   }
@@ -48,30 +53,28 @@ exports.postAddPost = async (req, res, next) => {
     const { statusCode, body } = await request.post({
       url: `${API_URL}/offers`,
       json: true,
+      headers: {
+        authorization: `Bearer ${req.cookies.user_accessToken}`,
+      },
       body: offer,
     });
 
     if (statusCode === HttpCode.CREATED) {
       return res.redirect(`/my`);
     }
-
-    if (statusCode === HttpCode.UNPROCESSABLE_ENTITY) {
-      const errorsArr = body;
-      console.log(errorsArr);
-      console.log(categoriesResult.body);
-      return res.render(`offers/new-ticket`, {
-        offer,
-        categories: categoriesResult.body,
-        errorsArr,
-      });
+    
+    if (statusCode === HttpCode.UNAUTHORIZED || statusCode === HttpCode.FORBIDDEN) {
+      ifUserAuthorisedCheck(req,res,clearUserCookie,setUserCookie);
     }
 
-    
-
     return res.render(`offers/new-ticket`, {
+      errorsArr: body,
       categories: categoriesResult.body,
-      action: `http://localhost:8080/offers/add`,
       offer,
+      userData: {
+        id: req.cookies.user_id,
+        avatar: req.cookies.user_avatar,
+      }
     });
   } catch (error) {
     return next(error);
@@ -80,6 +83,8 @@ exports.postAddPost = async (req, res, next) => {
 
 exports.getPostEdit = async (req, res, next) => {
   try {
+    ifUserAuthorisedCheck(req,res,clearUserCookie,setUserCookie);
+
     const { id } = req.params;
     const offersResult = await request.get({
       url: `${API_URL}/offers/${id}`,
@@ -102,6 +107,10 @@ exports.getPostEdit = async (req, res, next) => {
     return res.render(`offers/ticket-edit`, {
       offer: offersResult.body.offer,
       categories: categoriesResult.body,
+      userData: {
+        id: req.cookies.user_id,
+        avatar: req.cookies.user_avatar,
+      }
     });
   } catch (error) {
     return next(error);
@@ -110,7 +119,6 @@ exports.getPostEdit = async (req, res, next) => {
 
 exports.putPostEdit = async (req, res, next) => {
   try {
-    console.log(req.body)
     const categoriesResult = await request.get({
       url: `${API_URL}/category`,
       json: true,
@@ -137,6 +145,9 @@ exports.putPostEdit = async (req, res, next) => {
     const updatedOffer = await request.put({
       url: `${API_URL}/offers/${id}`,
       json: true,
+      headers: {
+        authorization: `Bearer ${req.cookies.user_accessToken}`,
+      },
       body: offer,
     });
 
@@ -144,23 +155,23 @@ exports.putPostEdit = async (req, res, next) => {
       return res.redirect(`/offers/${id}`);
     }
 
+    if (statusCode === HttpCode.UNAUTHORIZED || statusCode === HttpCode.FORBIDDEN) {
+      ifUserAuthorisedCheck(req,res,clearUserCookie,setUserCookie);
+    }
+
     if (updatedOffer.statusCode === HttpCode.INTERNAL_SERVER_ERROR) {
       return res.status(HttpCode.INTERNAL_SERVER_ERROR).render(`errors/500`);
     }
 
-    // if (updatedOffer.statusCode === HttpCode.UNPROCESSABLE_ENTITY) {
-    //   const errorsArr = updatedOffer.body;
-    //   console.log(errorsArr);
-    //   console.log(categoriesResult.body);
-    //   return res.render(`offers/ticket-edit`,{offer,categories: categoriesResult.body,errorsArr});
-    // }
     return res.render(`offers/ticket-edit`, {
       categories: categoriesResult.body,
       offer,
       errorsArr: updatedOffer.body,
+      userData: {
+        id: req.cookies.user_id,
+        avatar: req.cookies.user_avatar,
+      }
     });
-
-    
   } catch (error) {
     return next(error);
   }
@@ -187,7 +198,10 @@ exports.get_offerById = async (req, res, next) => {
       return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
     }
 
-    return res.render(`offers/ticket`, { offer: offer.body.offer, user: offer.body.user, categories: offer.body.categoriesIds.categories, comments: comments.body});
+    return res.render(`offers/ticket`, { offer: offer.body.offer, user: offer.body.user, categories: offer.body.categoriesIds.categories, comments: comments.body,userData: {
+      id: req.cookies.user_id,
+      avatar: req.cookies.user_avatar,
+    }});
 
   } catch (error) {
     return next(error);
@@ -202,11 +216,18 @@ exports.post_commentById = async (req,res,next) => {
     const newComment = await request.post({
       url: `${API_URL}/offers/${ id }/comments`,
       json: true,
+      headers: {
+        authorization: `Bearer ${req.cookies.user_accessToken}`,
+      },
       body: {comment}
     });
 
     if (newComment.statusCode === HttpCode.CREATED) {
-      return res.redirect(`/my/comments`);
+      return res.redirect(`/offers/${id}`);
+    }
+
+    if (statusCode === HttpCode.UNAUTHORIZED || statusCode === HttpCode.FORBIDDEN) {
+      ifUserAuthorisedCheck(req,res,clearUserCookie,setUserCookie);
     }
 
     if (newComment.statusCode === HttpCode.UNPROCESSABLE_ENTITY) {
@@ -231,7 +252,10 @@ exports.post_commentById = async (req,res,next) => {
       return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
     }
 
-    return res.render(`offers/ticket`, { offer: offer.body.offer, user: offer.body.user, categories: offer.body.categoriesIds.categories, comments: comments.body, userComment: comment,errorsArr: newComment.body});
+    return res.render(`offers/ticket`, { offer: offer.body.offer, user: offer.body.user, categories: offer.body.categoriesIds.categories, comments: comments.body, userComment: comment,errorsArr: newComment.body, userData: {
+      id: req.cookies.user_id,
+      avatar: req.cookies.user_avatar,
+    }});
   
   } catch(error) {
     return next(error);

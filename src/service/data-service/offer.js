@@ -1,6 +1,5 @@
 "use strict";
 
-
 class OfferService {
   constructor(dataBase) {
     const { sequelize, models } = dataBase;
@@ -29,7 +28,7 @@ class OfferService {
           `category`,
         ],
         `createdDate`,
-        `userId`
+        `userId`,
       ],
       group: [
         `offer.id`,
@@ -43,7 +42,7 @@ class OfferService {
     };
   }
 
-  async findAll({ offset, limit }) {
+  async findAll({ limit }) {
     const { Offer } = this._models;
 
     try {
@@ -51,7 +50,6 @@ class OfferService {
         Offer.count(),
         Offer.findAll({
           ...this._selectOptions,
-          offset,
           limit,
           subQuery: false,
         }),
@@ -68,19 +66,21 @@ class OfferService {
     }
   }
 
-  async findAllByUser({ offset, limit, id}) {
-    const { Offer} = this._models;
+  async findAllByUser({ offset, limit, id }) {
+    const { Offer } = this._models;
 
     try {
       const [quantity, offers] = await Promise.all([
-        Offer.count(),
+        Offer.count({where: {
+          userId: id,
+        },}),
         Offer.findAll({
           ...this._selectOptions,
           offset,
           limit,
           subQuery: false,
           where: {
-            userId: id
+            userId: id,
           },
         }),
       ]);
@@ -103,21 +103,19 @@ class OfferService {
     title,
     type,
     sum,
+    id,
   }) {
     const { sequelize } = this._dataBase;
     const { Offer, Category, User } = this._models;
 
     try {
-      
-      const user = await User.findByPk(4);
+      const user = await User.findByPk(id);
       const lastId = await Offer.findAll({
         limit: 1,
-        order: [ [ 'id', 'DESC' ]],
-        attributes: [
-          `id`
-        ]
+        order: [["id", "DESC"]],
+        attributes: [`id`],
       });
-      const newId = Number.parseInt(lastId[0]['dataValues']['id'], 10) + 1;
+      const newId = Number.parseInt(lastId[0]["dataValues"]["id"], 10) + 1;
       const newOffer = await user.createOffer({
         id: newId,
         title,
@@ -136,7 +134,7 @@ class OfferService {
       });
 
       await newOffer.setCategories(categories);
-      console.log(JSON.stringify(newOffer));
+
       return await Offer.findByPk(newOffer.id, this._selectOptions);
     } catch (error) {
       console.error(`Can't create offer. Error: ${error.message}`);
@@ -160,30 +158,23 @@ class OfferService {
   }
 
   async findById(id) {
-    const { Offer, Category, User} = this._models;
+    const { Offer, Category, User } = this._models;
     const offerId = Number.parseInt(id, 10);
 
     try {
       const offer = await Offer.findByPk(offerId, this._selectOptions);
       const user = await User.findByPk(offer.userId, {
-        attributes: [
-          `firstName`,
-          `lastName`,
-          `email`,
-          `avatar`
-        ],
+        attributes: [`firstName`, `lastName`, `email`, `avatar`],
       });
-      
+
       const categoriesIds = await Offer.findByPk(offerId, {
         include: {
           model: Category,
-          attributes: [
-            `id`
-          ],
+          attributes: [`id`],
         },
         attributes: [],
-      })
-      return {offer,user,categoriesIds};
+      });
+      return { offer, user, categoriesIds };
     } catch (error) {
       console.error(`Can't find offer. Error: ${error}`);
 
@@ -277,7 +268,7 @@ class OfferService {
         ...this._selectOptions,
         where: {
           title: {
-            [sequelize.Sequelize.Op.iLike]: `%${title}%`, 
+            [sequelize.Sequelize.Op.iLike]: `%${title}%`,
           },
         },
       });
@@ -305,13 +296,12 @@ class OfferService {
         ],
         include: {
           model: Category,
-          as: 'categories',
+          as: "categories",
           through: "offers_categories",
           where: {
             id: CategoryId,
           },
-         
-        }
+        },
       });
       /* 
      /*  const offersCategories = await Offer.findAll({
