@@ -9,7 +9,7 @@ if userData['id']
             a(href='/my') Публикации
           li.header__item
             a(href='/my/comments') Комментарии
-      form.search(method='GET', action='http://localhost:8080/search', autocomplete='off')
+      form.search(method='GET', action='/search', autocomplete='off')
         input(type='search', name='search', placeholder='Поиск', aria-label='Поиск')
         .search__icon
         .search__close-btn
@@ -27,7 +27,7 @@ else
             a(href='/') Публикации
           li.header__item
             a(href='/my/comments') Комментарии
-      form.search(method='GET', action='http://localhost:8080/search', autocomplete='off')
+      form.search(method='GET', action='/search', autocomplete='off')
         input(type='search', name='search', placeholder='Поиск', aria-label='Поиск')
         .search__icon
         .search__close-btn

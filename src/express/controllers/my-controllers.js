@@ -5,15 +5,13 @@ const { HttpCode } = require(`../../constants`);
 const { API_URL } = require(`../../constants`);
 const { setUserCookie, clearUserCookie, ifUserAuthorisedCheck, getNewAccessToken } = require(`../helpers/jwt-helper`);
 const { createPaginationPages } = require(`./utils`);
+const { page_pagination } = require('./constants')
 
-const OFFERS_LIMIT_QUANTITY_ON_PAGE = 8;
-const OFFERS_COMMENTS_LIMIT_QUANTITY_ON_PAGE = 5;
-const DEFAULT_PAGE = 1;
 
 exports.getMyPage = async (req, res, next) => {
   const { page } = req.query;
-  const currentPage = page ? Number.parseInt(page, 10) : DEFAULT_PAGE;
-  const offset = (currentPage - 1) * OFFERS_LIMIT_QUANTITY_ON_PAGE;
+  const currentPage = page ? Number.parseInt(page, 10) : page_pagination.DEFAULT_PAGE;
+  const offset = (currentPage - 1) * page_pagination.OFFERS_LIMIT_QUANTITY_ON_PAGE;
 
   let offers = [];
   let offersQuantity = 0;
@@ -22,7 +20,7 @@ exports.getMyPage = async (req, res, next) => {
     ifUserAuthorisedCheck(req,res,clearUserCookie,setUserCookie);
 
     const { statusCode, body } = await request.get({
-      url: `${API_URL}/offers/my?offset=${offset}&limit=${OFFERS_LIMIT_QUANTITY_ON_PAGE}`,
+      url: `${API_URL}/offers/my?offset=${offset}&limit=${page_pagination.OFFERS_LIMIT_QUANTITY_ON_PAGE}`,
       json: true,
       headers: {
         authorization: `Bearer ${req.cookies.user_accessToken}`,
@@ -43,10 +41,10 @@ exports.getMyPage = async (req, res, next) => {
   }
 
   const pagesQuantity = Math.ceil(
-    offersQuantity / OFFERS_LIMIT_QUANTITY_ON_PAGE || 1 / OFFERS_LIMIT_QUANTITY_ON_PAGE
+    offersQuantity / page_pagination.OFFERS_LIMIT_QUANTITY_ON_PAGE || 1 / page_pagination.OFFERS_LIMIT_QUANTITY_ON_PAGE
   );
   const pages = createPaginationPages({ quantity: pagesQuantity, currentPage });
-  console.log({ offers, currentPage, pages });
+
   return res.render(`my-tickets`, {
     offers,
     currentPage,
@@ -63,7 +61,7 @@ exports.getMyComments = async (req, res, next) => {
     ifUserAuthorisedCheck(req,res,clearUserCookie,setUserCookie);
 
     const { statusCode, body } = await request.get({
-      url: `${API_URL}/offers/my?limit=${OFFERS_COMMENTS_LIMIT_QUANTITY_ON_PAGE}`,
+      url: `${API_URL}/offers/my?limit=${page_pagination.OFFERS_COMMENTS_LIMIT_QUANTITY_ON_PAGE}`,
       json: true,
       headers: {
         authorization: `Bearer ${req.cookies.user_accessToken}`,
@@ -78,7 +76,7 @@ exports.getMyComments = async (req, res, next) => {
     const userOffersIds = offers.map(({ id }) => id);
     const commentRequests = userOffersIds.map((id) =>
       request.get({
-        url: `http://localhost:3000/api/offers/${id}/comments`,
+        url: `${API_URL}/offers/${id}/comments`,
         json: true,
       })
     );

@@ -18,16 +18,20 @@ block content
                     else if offer.type === 'buy'
                       | Куплю
             ul.comments-list
-              each comment in userComments[index]
-                li.js-card
-                  .comment-card
-                    .comment-card__header
-                      a.comment-card__avatar.avatar(href='#')
-                        img(src='/img/' + comment.user.avatar, srcset='/img/' + `${comment.user.avatar} 2x`, alt='Аватар пользователя')
-                      p.comment-card__author #{comment.user.firstName} #{comment.user.lastName} 
-                    .comment-card__content
-                      p #{comment.message}
-                    form(action=`http://localhost:8080/my/comments`, method='POST', autocomplete='off')
-                      input.visually-hidden(type='text', name='commentId',value=`${comment.id}`)
-                      input.visually-hidden(type='text', name='offerId',value=`${offer.id}`)
-                      button.comment-card__delete.js-delete(type='submit') Удалить
+              if !userComments[index][0]
+                .ticket__message
+                      p У этой публикации еще нет ни одного комментария.
+              else
+                each comment in userComments[index]
+                    li.js-card
+                      .comment-card
+                        .comment-card__header
+                          a.comment-card__avatar.avatar(href='#')
+                            img(src='/img/' + comment.user.avatar, srcset='/img/' + `${comment.user.avatar} 2x`, alt='Аватар пользователя')
+                          p.comment-card__author #{comment.user.firstName} #{comment.user.lastName} 
+                        .comment-card__content
+                          p #{comment.message}
+                        form(action=`/my/comments`, method='POST', autocomplete='off')
+                          input.visually-hidden(type='text', name='commentId',value=`${comment.id}`)
+                          input.visually-hidden(type='text', name='offerId',value=`${offer.id}`)
+                          button.comment-card__delete.js-delete(type='submit') Удалить

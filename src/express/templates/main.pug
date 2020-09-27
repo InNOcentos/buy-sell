@@ -31,11 +31,12 @@ block content
                       |  ₽
                   .ticket-card__desc
                     p #{offer.description}
+        include ./partials/pagination
     section.tickets-list
       h2.visually-hidden Самые ценные предложения
       .tickets-list__wrapper
         .tickets-list__header
-          p.tickets-list__title Самые дорогие
+          p.tickets-list__title Самые ценные
         ul
           each offer, index in valuableOffers
             li.tickets-list__item
@@ -59,3 +60,4 @@ block content
                       |  ₽
                   .ticket-card__desc
                     p #{offer.description}
+        

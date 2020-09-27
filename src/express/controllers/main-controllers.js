@@ -3,10 +3,17 @@
 const { request } = require(`../request`);
 const { HttpCode, API_URL } = require(`../../constants`);
 const { setUserCookie, clearUserCookie } = require(`../helpers/jwt-helper`);
-const OFFERS_LIMIT_QUANTITY_ON_PAGE = 8;
+const { page_pagination } = require('./constants')
+const { createPaginationPages } = require(`./utils`);
 
 exports.getHomePage = async (req, res, next) => {
-  let freshOffers = [], valuableOffers = [], categories = [];
+  const { page } = req.query;
+  const currentPage = page ? Number.parseInt(page, 10) : page_pagination.DEFAULT_PAGE;
+  const offset = (currentPage - 1) * page_pagination.OFFERS_LIMIT_QUANTITY_ON_PAGE;
+
+  let freshOffers = [], valuableOffers = [], categories = [], offersQuantity = 0;
+
+
   if (!req.cookies.user_accessToken && req.cookies.user_refreshToken) {
     const { statusCode, body } = await request.post({
       url: `${API_URL}/user/refresh`,
@@ -24,13 +31,14 @@ exports.getHomePage = async (req, res, next) => {
 
   try {
     const { statusCode, body } = await request.get({
-      url: `${API_URL}/offers?limit=${OFFERS_LIMIT_QUANTITY_ON_PAGE}`,
+      url: `${API_URL}/offers?offset=${offset}&limit=${page_pagination.OFFERS_LIMIT_QUANTITY_ON_PAGE}`,
       json: true,
     });
 
     if (statusCode === HttpCode.OK) {
       freshOffers = body.freshOffers.offers;
       valuableOffers = body.valuableOffers.offers;
+      offersQuantity = body.freshOffers.quantity;
     }
   } catch (error) {
     next(error);
@@ -48,16 +56,26 @@ exports.getHomePage = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-
-  res.render(`main`, {
-    offers: freshOffers,
-    valuableOffers,
-    categories,
-    userData: {
-      id: req.cookies.user_id,
-      avatar: req.cookies.user_avatar,
-    },
-  });
+  try {
+    const pagesQuantity = Math.ceil(
+      offersQuantity / page_pagination.OFFERS_LIMIT_QUANTITY_ON_PAGE || 1 / page_pagination.OFFERS_LIMIT_QUANTITY_ON_PAGE
+    );
+    const pages = createPaginationPages({ quantity: pagesQuantity, currentPage });
+  
+    res.render(`main`, {
+      offers: freshOffers,
+      valuableOffers,
+      categories,
+      pages,
+      userData: {
+        id: req.cookies.user_id,
+        avatar: req.cookies.user_avatar,
+      },
+    });
+  } catch (error){
+    next(error)
+  }
+  
 };
 
 exports.getSearch = async (req, res, next) => {

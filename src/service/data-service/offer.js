@@ -42,7 +42,7 @@ class OfferService {
     };
   }
 
-  async findAll({ limit }) {
+  async findAll({offset, limit }) {
     const { Offer } = this._models;
 
     try {
@@ -51,6 +51,7 @@ class OfferService {
         Offer.findAll({
           ...this._selectOptions,
           limit,
+          offset,
           subQuery: false,
         }),
       ]);
