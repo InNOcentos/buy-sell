@@ -6,6 +6,7 @@ const {
   setUserCookie,
   clearUserCookie,
   ifUserAuthorisedCheck,
+  ifIsUserOfferCheck,
 } = require(`../helpers/jwt-helper`);
 
 exports.getAddPost = async (req, res, next) => {
@@ -94,8 +95,11 @@ exports.postAddPost = async (req, res, next) => {
 exports.getPostEdit = async (req, res, next) => {
   try {
     ifUserAuthorisedCheck(req, res, clearUserCookie, setUserCookie);
-
+    
     const { id } = req.params;
+    
+    ifIsUserOfferCheck(req, res, id);
+
     const offersResult = await request.get({
       url: `${API_URL}/offers/${id}`,
       json: true,
@@ -166,8 +170,8 @@ exports.putPostEdit = async (req, res, next) => {
     }
 
     if (
-      statusCode === HttpCode.UNAUTHORIZED ||
-      statusCode === HttpCode.FORBIDDEN
+      updatedOffer.statusCode === HttpCode.UNAUTHORIZED ||
+      updatedOffer.statusCode === HttpCode.FORBIDDEN
     ) {
       ifUserAuthorisedCheck(req, res, clearUserCookie, setUserCookie);
     }
@@ -295,7 +299,7 @@ exports.post_commentById = async (req, res, next) => {
 exports.getOffersByCategory = async (req, res, next) => {
   try {
     const { id } = req.params;
-    console.log(id)
+    console.log(id);
     try {
       const categoryId = id;
 
@@ -305,14 +309,16 @@ exports.getOffersByCategory = async (req, res, next) => {
       });
       const results = statusCode === HttpCode.OK ? body : [];
 
-      res.render(`search-result`, { results,userData: {
-        id: req.cookies.user_id,
-        avatar: req.cookies.user_avatar,
-      } });
+      res.render(`search-result`, {
+        results,
+        userData: {
+          id: req.cookies.user_id,
+          avatar: req.cookies.user_avatar,
+        },
+      });
     } catch (error) {
       next(error);
     }
-    
   } catch (error) {
     return next(error);
   }

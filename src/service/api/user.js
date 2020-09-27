@@ -98,4 +98,18 @@ module.exports = (app, userService, RefreshTokenService) => {
       
   })
 
+  route.get(`/check`, authenticateJwt, async (req, res, next) => {
+    try {
+      const {id: user_id} = res.locals.user;
+      const offer_id = req.query.q;
+
+      const haveRights = await userService.checkRights(user_id,offer_id);
+
+      return res.status(HttpCode.OK).json(haveRights);
+    } catch (error) {
+      next(error);
+    }
+      
+  })
+
 };

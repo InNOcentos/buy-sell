@@ -3,12 +3,13 @@
 const {Router} = require(`express`);
 
 const {HttpCode} = require(`../../constants`);
-const {isOfferExists,offerValidator,commentValidator, authenticateJwt} = require('../middlewares')
+const {isOfferExists,offerValidator,commentValidator, authenticateJwt, ifIsUserOfferCheck} = require('../middlewares')
 const {offerSchema,commentSchema} = require(`../schemas`);
 const route = new Router();
 
-module.exports = (app, offerService, commentService) => {
+module.exports = (app, offerService, commentService, userService) => {
   const isOfferExistsMiddleware = isOfferExists({service: offerService});
+  const ifIsUserOfferCheckMiddleware = ifIsUserOfferCheck({service: userService});
 
   app.use(`/offers`, route);
 
@@ -65,7 +66,7 @@ module.exports = (app, offerService, commentService) => {
     }
   });
 
-  route.put(`/:offerId`,[offerValidator(offerSchema),authenticateJwt], async (req, res, next) => {
+  route.put(`/:offerId`,[offerValidator(offerSchema),authenticateJwt,ifIsUserOfferCheckMiddleware], async (req, res, next) => {
     const {offerId} = req.params;
     const {category, description, picture, title, type, sum} = req.body;
     console.log({category, description, picture, title, type, sum})
@@ -78,7 +79,7 @@ module.exports = (app, offerService, commentService) => {
     }
   });
 
-  route.delete(`/:offerId`,[authenticateJwt,isOfferExistsMiddleware], async (req, res, next) => {
+  route.delete(`/:offerId`,[authenticateJwt,isOfferExistsMiddleware,ifIsUserOfferCheckMiddleware], async (req, res, next) => {
     const {offerId} = req.params;
 
     try {
@@ -115,7 +116,7 @@ module.exports = (app, offerService, commentService) => {
     }
   });
 
-  route.delete(`/:offerId/comments/:commentId`,authenticateJwt, async (req, res) => {
+  route.delete(`/:offerId/comments/:commentId`,[authenticateJwt,ifIsUserOfferCheckMiddleware], async (req, res) => {
     const {commentId} = req.params;
 
     try {

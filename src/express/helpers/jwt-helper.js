@@ -40,7 +40,7 @@ exports.ifUserAuthorisedCheck = async (req,res,cb1,cb2) => {
         const { id, avatar } = userData;
         cb2(refreshToken, accessToken, id, avatar, res);
       }
-      console.log(statusCode);
+      
       return res.redirect("/login");
     }
   } catch (error) {
@@ -64,6 +64,29 @@ exports.getNewAccessToken = async (req,res,cb) => {
     }
     console.log(statusCode);
     return res.redirect("/login");
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+exports.ifIsUserOfferCheck = async (req,res, id) => {
+  try {
+    const offer_id = id; 
+    const { statusCode, body } = await request.get({
+      url: `${API_URL}/user/check?q=${offer_id}`,
+      json: true,
+      headers: {
+        authorization: `Bearer ${req.cookies.user_accessToken}`,
+      }
+    });
+    if (statusCode === HttpCode.OK) {
+      const match = body;
+      
+      if (match !== true) {
+        return res.redirect('/');
+      }
+      console.log(`match: ${match}`);
+    }
   } catch (error) {
     console.log(error)
   }

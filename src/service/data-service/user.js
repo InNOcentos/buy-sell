@@ -63,6 +63,19 @@ class UserService {
         return null;
       }
     }
+
+    async checkRights(user_id,offer_id) {
+      const { Offer } = this._models;
+      try {
+        const match = await Offer.findByPk(offer_id);
+
+        return match.dataValues.userId === user_id;
+      } catch (error) {
+        console.error(`Can't check if user have access. Error: ${error}`);
+
+        return null;
+      }
+    }
 }
 
 

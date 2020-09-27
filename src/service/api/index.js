@@ -24,7 +24,7 @@ const app = new Router();
 
   category(app, new CategoryService(database));
   search(app, new OfferService(database));
-  offer(app, new OfferService(database), new CommentService(database));
+  offer(app, new OfferService(database), new CommentService(database), new UserService(database));
   user(app, new UserService(database), new RefreshTokenService());
 })();
 
