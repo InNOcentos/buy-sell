@@ -1,12 +1,16 @@
 "use strict";
 
 const { request } = require(`../request`);
-const { HttpCode,API_URL} = require(`../../constants`);
-const { setUserCookie, clearUserCookie, ifUserAuthorisedCheck } = require(`../helpers/jwt-helper`);
+const { HttpCode, API_URL } = require(`../../constants`);
+const {
+  setUserCookie,
+  clearUserCookie,
+  ifUserAuthorisedCheck,
+} = require(`../helpers/jwt-helper`);
 
 exports.getAddPost = async (req, res, next) => {
   try {
-    ifUserAuthorisedCheck(req,res,clearUserCookie,setUserCookie);
+    ifUserAuthorisedCheck(req, res, clearUserCookie, setUserCookie);
 
     const { statusCode, body: categories } = await request.get({
       url: `${API_URL}/category`,
@@ -17,10 +21,13 @@ exports.getAddPost = async (req, res, next) => {
       return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
     }
 
-    return res.render(`offers/new-ticket`, { categories , userData: {
-      id: req.cookies.user_id,
-      avatar: req.cookies.user_avatar,
-    } });
+    return res.render(`offers/new-ticket`, {
+      categories,
+      userData: {
+        id: req.cookies.user_id,
+        avatar: req.cookies.user_avatar,
+      },
+    });
   } catch (error) {
     return next(error);
   }
@@ -62,9 +69,12 @@ exports.postAddPost = async (req, res, next) => {
     if (statusCode === HttpCode.CREATED) {
       return res.redirect(`/my`);
     }
-    
-    if (statusCode === HttpCode.UNAUTHORIZED || statusCode === HttpCode.FORBIDDEN) {
-      ifUserAuthorisedCheck(req,res,clearUserCookie,setUserCookie);
+
+    if (
+      statusCode === HttpCode.UNAUTHORIZED ||
+      statusCode === HttpCode.FORBIDDEN
+    ) {
+      ifUserAuthorisedCheck(req, res, clearUserCookie, setUserCookie);
     }
 
     return res.render(`offers/new-ticket`, {
@@ -74,7 +84,7 @@ exports.postAddPost = async (req, res, next) => {
       userData: {
         id: req.cookies.user_id,
         avatar: req.cookies.user_avatar,
-      }
+      },
     });
   } catch (error) {
     return next(error);
@@ -83,7 +93,7 @@ exports.postAddPost = async (req, res, next) => {
 
 exports.getPostEdit = async (req, res, next) => {
   try {
-    ifUserAuthorisedCheck(req,res,clearUserCookie,setUserCookie);
+    ifUserAuthorisedCheck(req, res, clearUserCookie, setUserCookie);
 
     const { id } = req.params;
     const offersResult = await request.get({
@@ -110,7 +120,7 @@ exports.getPostEdit = async (req, res, next) => {
       userData: {
         id: req.cookies.user_id,
         avatar: req.cookies.user_avatar,
-      }
+      },
     });
   } catch (error) {
     return next(error);
@@ -152,11 +162,14 @@ exports.putPostEdit = async (req, res, next) => {
     });
 
     if (updatedOffer.statusCode === HttpCode.OK) {
-      return res.redirect(`/offers/${id}`);
+      return res.redirect(`/my`);
     }
 
-    if (statusCode === HttpCode.UNAUTHORIZED || statusCode === HttpCode.FORBIDDEN) {
-      ifUserAuthorisedCheck(req,res,clearUserCookie,setUserCookie);
+    if (
+      statusCode === HttpCode.UNAUTHORIZED ||
+      statusCode === HttpCode.FORBIDDEN
+    ) {
+      ifUserAuthorisedCheck(req, res, clearUserCookie, setUserCookie);
     }
 
     if (updatedOffer.statusCode === HttpCode.INTERNAL_SERVER_ERROR) {
@@ -170,7 +183,7 @@ exports.putPostEdit = async (req, res, next) => {
       userData: {
         id: req.cookies.user_id,
         avatar: req.cookies.user_avatar,
-      }
+      },
     });
   } catch (error) {
     return next(error);
@@ -181,7 +194,7 @@ exports.get_offerById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const offer = await request.get({
-      url: `${API_URL}/offers/${ id }`,
+      url: `${API_URL}/offers/${id}`,
       json: true,
     });
 
@@ -189,8 +202,10 @@ exports.get_offerById = async (req, res, next) => {
       return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
     }
 
+    offer.body.offer.createdDate = offer.body.offer.createdDate.split("T")[0];
+
     const comments = await request.get({
-      url: `${API_URL}/offers/${ id }/comments`,
+      url: `${API_URL}/offers/${id}/comments`,
       json: true,
     });
 
@@ -198,44 +213,52 @@ exports.get_offerById = async (req, res, next) => {
       return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
     }
 
-    return res.render(`offers/ticket`, { offer: offer.body.offer, user: offer.body.user, categories: offer.body.categoriesIds.categories, comments: comments.body,userData: {
-      id: req.cookies.user_id,
-      avatar: req.cookies.user_avatar,
-    }});
-
+    return res.render(`offers/ticket`, {
+      offer: offer.body.offer,
+      user: offer.body.user,
+      categories: offer.body.categoriesIds.categories,
+      comments: comments.body,
+      userData: {
+        id: req.cookies.user_id,
+        avatar: req.cookies.user_avatar,
+      },
+    });
   } catch (error) {
     return next(error);
   }
 };
 
-exports.post_commentById = async (req,res,next) => {
+exports.post_commentById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { comment } = req.body;
 
     const newComment = await request.post({
-      url: `${API_URL}/offers/${ id }/comments`,
+      url: `${API_URL}/offers/${id}/comments`,
       json: true,
       headers: {
         authorization: `Bearer ${req.cookies.user_accessToken}`,
       },
-      body: {comment}
+      body: { comment },
     });
 
     if (newComment.statusCode === HttpCode.CREATED) {
       return res.redirect(`/offers/${id}`);
     }
 
-    if (statusCode === HttpCode.UNAUTHORIZED || statusCode === HttpCode.FORBIDDEN) {
-      ifUserAuthorisedCheck(req,res,clearUserCookie,setUserCookie);
+    if (
+      statusCode === HttpCode.UNAUTHORIZED ||
+      statusCode === HttpCode.FORBIDDEN
+    ) {
+      ifUserAuthorisedCheck(req, res, clearUserCookie, setUserCookie);
     }
 
     if (newComment.statusCode === HttpCode.UNPROCESSABLE_ENTITY) {
-      console.log(newComment.body)
+      console.log(newComment.body);
     }
 
     const offer = await request.get({
-      url: `${API_URL}/offers/${ id }`,
+      url: `${API_URL}/offers/${id}`,
       json: true,
     });
 
@@ -244,7 +267,7 @@ exports.post_commentById = async (req,res,next) => {
     }
 
     const comments = await request.get({
-      url: `${API_URL}/offers/${ id }/comments`,
+      url: `${API_URL}/offers/${id}/comments`,
       json: true,
     });
 
@@ -252,12 +275,45 @@ exports.post_commentById = async (req,res,next) => {
       return res.status(HttpCode.NOT_FOUND).render(`errors/404`);
     }
 
-    return res.render(`offers/ticket`, { offer: offer.body.offer, user: offer.body.user, categories: offer.body.categoriesIds.categories, comments: comments.body, userComment: comment,errorsArr: newComment.body, userData: {
-      id: req.cookies.user_id,
-      avatar: req.cookies.user_avatar,
-    }});
-  
-  } catch(error) {
+    return res.render(`offers/ticket`, {
+      offer: offer.body.offer,
+      user: offer.body.user,
+      categories: offer.body.categoriesIds.categories,
+      comments: comments.body,
+      userComment: comment,
+      errorsArr: newComment.body,
+      userData: {
+        id: req.cookies.user_id,
+        avatar: req.cookies.user_avatar,
+      },
+    });
+  } catch (error) {
     return next(error);
   }
-}
+};
+
+exports.getOffersByCategory = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    console.log(id)
+    try {
+      const categoryId = id;
+
+      const { statusCode, body } = await request.get({
+        url: `${API_URL}/search/${categoryId}`,
+        json: true,
+      });
+      const results = statusCode === HttpCode.OK ? body : [];
+
+      res.render(`search-result`, { results,userData: {
+        id: req.cookies.user_id,
+        avatar: req.cookies.user_avatar,
+      } });
+    } catch (error) {
+      next(error);
+    }
+    
+  } catch (error) {
+    return next(error);
+  }
+};

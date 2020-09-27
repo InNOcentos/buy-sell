@@ -10,7 +10,7 @@ module.exports = (app, offerService) => {
 
   route.get(`/`, async (req, res, next) => {
     const decodedQuery = decodeURI(req.query.query);
-
+    
     if (!decodedQuery) {
       res.status(HttpCode.BAD_REQUEST).send(`Invalid query`);
       return console.error(`Invalid query.`);

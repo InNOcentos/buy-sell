@@ -15,10 +15,13 @@ module.exports = (app, offerService, commentService) => {
   route.get('/', async (req, res, next) => {
     try {
       const {limit} = req.query;
+      const secondOffersSectionLimit = limit / 2;
       
-      const result = await offerService.findAll({limit});
 
-      return res.status(HttpCode.OK).json(result);
+      const freshOffers = await offerService.findAll({limit});
+      const valuableOffers = await offerService.findAllValuable({secondOffersSectionLimit});
+
+      return res.status(HttpCode.OK).json({freshOffers,valuableOffers});
     } catch (error) {
       next(error);
     }

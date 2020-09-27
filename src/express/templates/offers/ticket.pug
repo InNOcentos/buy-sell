@@ -34,7 +34,7 @@ block content
             ul.ticket__tags
               each category,index in categories
                 li
-                  a.category-tile.category-tile--small(href="#")
+                  a.category-tile.category-tile--small(href=`/offers/category/${categories[index].id}`)
                     span.category-tile__image
                       img(src=`/img/cat0` + category.id + `.jpg`,srcset=`/img/cat0` + category.id + `@2x.jpg`, alt=`Иконка категории`)
                     span.category-tile__label #{offer.category[index]}
@@ -42,7 +42,7 @@ block content
           h2.ticket__subtitle Коментарии
           if userData['id']
             .ticket__comment-form
-            form.form.comment-form(action=`http://localhost:8080/offers/${offer.id}` method="post")
+            form.form.comment-form(action=`/offers/${offer.id}` method="post")
               .comment-form__header
                 a.comment-form__avatar.avatar(href="#")
                   img(src=`/img/` + userData.avatar, alt="Аватар пользователя")

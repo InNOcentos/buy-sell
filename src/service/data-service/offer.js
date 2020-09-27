@@ -66,6 +66,31 @@ class OfferService {
     }
   }
 
+  async findAllValuable({ secondOffersSectionLimit }) {
+    const { Offer } = this._models;
+
+    try {
+      const [quantity, offers] = await Promise.all([
+        Offer.count(),
+        Offer.findAll({
+          ...this._selectOptions,
+          order: [[`sum`, `DESC`]],
+          limit: secondOffersSectionLimit,
+          subQuery: false,
+        }),
+      ]);
+
+      return {
+        offers,
+        quantity,
+      };
+    } catch (error) {
+      console.error(`Can't findAll offers. Error: ${error}`);
+
+      return [];
+    }
+  }
+
   async findAllByUser({ offset, limit, id }) {
     const { Offer } = this._models;
 
@@ -262,7 +287,7 @@ class OfferService {
   async findAllByTitle(title) {
     const { sequelize } = this._dataBase;
     const { Offer } = this._models;
-
+    console.log(title)
     try {
       return await Offer.findAll({
         ...this._selectOptions,
@@ -281,12 +306,11 @@ class OfferService {
 
   async findAllByCategory(categoryId) {
     const { Offer, Category } = this._models;
-    /* const {sequelize} = this._dataBase */
     const CategoryId = Number.parseInt(categoryId, 10);
 
     try {
       const offers = await Offer.findAll({
-        attributes: [
+         attributes: [
           `id`,
           `title`,
           [`image`, `picture`],
@@ -301,19 +325,8 @@ class OfferService {
           where: {
             id: CategoryId,
           },
-        },
+        }
       });
-      /* 
-     /*  const offersCategories = await Offer.findAll({
-        ...this._selectOptions,
-        attributes: [
-          `id`,
-          [
-            sequelize.fn(`ARRAY_AGG`, sequelize.col(`categories.title`)),
-            `category`,
-          ],
-        ],
-      }) */
 
       return await offers;
     } catch (error) {

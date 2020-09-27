@@ -3,7 +3,7 @@ section.categories-list
   ul.categories-list__wrapper
     each category,index in categories
       li.categories-list__item
-        a.category-tile.category-tile--default(href=`http://localhost:8080/search?category=${categories[index].id}`)
+        a.category-tile.category-tile--default(href=`/offers/category/${categories[index].id}`)
           span.category-tile__image
             img(src=`/img/cat0` + category.id + `.jpg`,srcset=`/img/cat0` + category.id + `@2x.jpg`, alt=`Иконка категории`)
           span.category-tile__label

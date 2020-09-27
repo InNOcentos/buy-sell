@@ -6,7 +6,7 @@ const { setUserCookie, clearUserCookie } = require(`../helpers/jwt-helper`);
 const OFFERS_LIMIT_QUANTITY_ON_PAGE = 8;
 
 exports.getHomePage = async (req, res, next) => {
-  let offers = [], categories = [];
+  let freshOffers = [], valuableOffers = [], categories = [];
   if (!req.cookies.user_accessToken && req.cookies.user_refreshToken) {
     const { statusCode, body } = await request.post({
       url: `${API_URL}/user/refresh`,
@@ -29,7 +29,8 @@ exports.getHomePage = async (req, res, next) => {
     });
 
     if (statusCode === HttpCode.OK) {
-      offers = body.offers;
+      freshOffers = body.freshOffers.offers;
+      valuableOffers = body.valuableOffers.offers;
     }
   } catch (error) {
     next(error);
@@ -48,23 +49,9 @@ exports.getHomePage = async (req, res, next) => {
     next(error);
   }
 
-  /*   res.clearCookie('user_id')
-    .clearCookie('user_avatar')
-    .clearCookie('user_accessToken')
-    .clearCookie('user_refreshToken').render(`main`, {
-      offers,
-      categories,
-      userData: {
-        id: req.cookies.user_id,
-        firstName: req.cookies.user_firstName,
-        lastName: req.cookies.user_lastName,
-        email: req.cookies.user_email,
-        avatar: req.cookies.user_avatar
-      }
-    });  */
-
   res.render(`main`, {
-    offers,
+    offers: freshOffers,
+    valuableOffers,
     categories,
     userData: {
       id: req.cookies.user_id,
@@ -84,23 +71,10 @@ exports.getSearch = async (req, res, next) => {
       });
       const results = statusCode === HttpCode.OK ? body : [];
 
-      res.render(`search-result`, { results });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  if (req.query.category) {
-    try {
-      const categoryId = req.query.category;
-
-      const { statusCode, body } = await request.get({
-        url: `${API_URL}/search/${categoryId}`,
-        json: true,
-      });
-      const results = statusCode === HttpCode.OK ? body : [];
-
-      res.render(`search-result`, { results });
+      res.render(`search-result`, { results,userData: {
+        id: req.cookies.user_id,
+        avatar: req.cookies.user_avatar,
+      }});
     } catch (error) {
       next(error);
     }
@@ -141,7 +115,7 @@ exports.post_signUpPage = async (req, res, next) => {
     };
     
     if (!!!userData.lastName) userData.lastName = "";
-    
+
     const { statusCode, body } = await request.post({
       url: `${API_URL}/user/register`,
       json: true,
