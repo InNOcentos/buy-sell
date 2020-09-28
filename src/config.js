@@ -19,4 +19,5 @@ module.exports = {
     db_dialect: process.env.DB_DIALECT,
     jwt_access_secret: process.env.JWT_ACCESS_SECRET,
     jwt_refresh_secret: process.env.JWT_REFRESH_SECRET,
+    log_level: process.env.LOG_LEVEL
 }

@@ -1,8 +1,10 @@
 'use strict';
 
+const config = require('../../config');
+
 const logger = require('pino')({
     name: 'REST_API',
-    level: process.env.LOG_LEVEL || 'info'
+    level: config.log_level || 'info'
 });
 
 module.exports = {
