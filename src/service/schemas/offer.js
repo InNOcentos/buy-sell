@@ -10,7 +10,7 @@ module.exports = Joi.object({
     "any.required": offerCreateMessage.EMPTY_VALUE,
   }),
   picture: Joi.string().required().messages({
-    "string.required": offerCreateMessage.EMPTY_PICTURE_VALUE,
+    "any.required": offerCreateMessage.EMPTY_PICTURE_VALUE,
   }), 
   sum: Joi.number().min(1).max(1000000).required().messages({
     "number.min": offerCreateMessage.MIN_SUM_COUNT,

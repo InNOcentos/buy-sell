@@ -2,7 +2,7 @@
 
 const {Router} = require('express');
 const {getAddPost, postAddPost, getPostEdit,putPostEdit,get_offerById, post_commentById, getOffersByCategory} = require(`../controllers/offers-controllers`);
-const {uploadFile, deleteFile} = require('../multer');
+const {uploadFile, deleteFile,uploadFileByOffer} = require('../multer');
 const offersRouter = new Router();
 
 offersRouter.get(`/category/:id`, getOffersByCategory); 

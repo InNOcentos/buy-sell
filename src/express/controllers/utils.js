@@ -9,7 +9,7 @@ const createPaginationPages = ({quantity, currentPage}) => {
       const visibleIndex = index + 1;
       const isActive = index === currentPageIndex;
       const href = isActive ? null : `?page=${ visibleIndex }`;
-  
+
       return {
         title: visibleIndex,
         href,

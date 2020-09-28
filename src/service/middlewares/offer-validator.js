@@ -9,6 +9,7 @@ module.exports = (schema) => (
            await schema.validateAsync({category, description, picture, title, type, sum}, { abortEarly: false });
         } catch(err) {
             const { details } = err;
+            console.log(details)
             res.status(HttpCode.UNPROCESSABLE_ENTITY).json(details);
             return;
         }

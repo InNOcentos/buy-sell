@@ -27,7 +27,7 @@ exports.getMyPage = async (req, res, next) => {
       },
     });
     if (statusCode === HttpCode.OK) {
-      console.log(`OK`);
+      
       offers = body.offers;
       offersQuantity = body.quantity;
     }
@@ -35,7 +35,7 @@ exports.getMyPage = async (req, res, next) => {
       getNewAccessToken(req,res,setUserCookie);
     }
     
-    console.log(offersQuantity)
+    
   } catch (error) {
     return next(error);
   }
@@ -117,7 +117,7 @@ exports.postMyPage = async (req, res, next) => {
       ifUserAuthorisedCheck(req,res,clearUserCookie,setUserCookie);
     }
     
-    console.log(statusCode);
+    
     return res.render(`errors/500`);
     
   } catch (error) {
@@ -144,7 +144,7 @@ exports.postMyComments = async (req, res, next) => {
       ifUserAuthorisedCheck(req,res,clearUserCookie,setUserCookie);
     }
     
-    console.log(statusCode);
+    
     return res.render(`errors/500`);
   } catch (error) {
     next(error);

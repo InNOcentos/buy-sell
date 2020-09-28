@@ -13,21 +13,29 @@ exports.getHomePage = async (req, res, next) => {
 
   let freshOffers = [], valuableOffers = [], categories = [], offersQuantity = 0;
 
+  try {
+    
+    if (!req.cookies.user_accessToken && req.cookies.user_refreshToken) {
 
-  if (!req.cookies.user_accessToken && req.cookies.user_refreshToken) {
-    const { statusCode, body } = await request.post({
-      url: `${API_URL}/user/refresh`,
-      json: true,
-      headers: {
-        token: `${req.cookies.user_refreshToken}`,
-      },
-    });
-    if (statusCode === HttpCode.OK) {
-      const { accessToken, refreshToken, userData } = body;
-      const { id, avatar } = userData;
-      setUserCookie(refreshToken, accessToken, id, avatar, res);
+      const { statusCode, body } = await request.post({
+        url: `${API_URL}/user/refresh`,
+        json: true,
+        headers: {
+          token: `${req.cookies.user_refreshToken}`,
+        },
+      });
+      if (statusCode === HttpCode.OK) {
+
+        const { accessToken, refreshToken, userData } = body;
+        const { id, avatar } = userData;
+        setUserCookie(refreshToken, accessToken, id, avatar, res);
+      }
+     
     }
+  } catch (error) {
+    next(error);
   }
+  
 
   try {
     const { statusCode, body } = await request.get({
@@ -80,6 +88,7 @@ exports.getHomePage = async (req, res, next) => {
 
 exports.getSearch = async (req, res, next) => {
   if (req.query.search) {
+    var freshOffersList = [];
     try {
       const encodedQuery = encodeURI(req.query.search);
 
@@ -89,7 +98,16 @@ exports.getSearch = async (req, res, next) => {
       });
       const results = statusCode === HttpCode.OK ? body : [];
 
-      res.render(`search-result`, { results,userData: {
+      const freshOffers = await request.get({
+        url: `${API_URL}/offers?limit=${page_pagination.OFFERS_LIMIT_QUANTITY_ON_PAGE}`,
+        json: true,
+      });
+  
+      if (freshOffers.statusCode === HttpCode.OK) {
+        freshOffersList = freshOffers.body.freshOffers.offers;
+      }
+
+      res.render(`search-result`, { results,offers:freshOffersList, userData: {
         id: req.cookies.user_id,
         avatar: req.cookies.user_avatar,
       }});
