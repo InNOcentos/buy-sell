@@ -30,7 +30,7 @@ block content
                 a(href="#") #{user.firstName} #{user.lastName}
               p
                 b Контакты:
-                a(href=`#{user.email}`) #{user.email}
+                a(href=`mailto:${user.email}`) #{user.email}
             ul.ticket__tags
               each category,index in categories
                 li

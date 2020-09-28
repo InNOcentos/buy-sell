@@ -11,7 +11,7 @@ module.exports = Joi.object({
   }),
   picture: Joi.string().required().messages({
     "any.required": offerCreateMessage.EMPTY_PICTURE_VALUE,
-  }), 
+  }),
   sum: Joi.number().min(1).max(1000000).required().messages({
     "number.min": offerCreateMessage.MIN_SUM_COUNT,
     "number.max": offerCreateMessage.MAX_SUM_COUNT,
@@ -25,7 +25,9 @@ module.exports = Joi.object({
     "string.max": offerCreateMessage.MAX_DESCRIPTION_LENGTH,
     "any.required": offerCreateMessage.EMPTY_VALUE,
   }),
-  category: Joi.array().items(Joi.string()).max(6).required().messages({
-    "any.required": offerCreateMessage.EMPTY_VALUE,
-  }),
+  category: Joi.array()
+    .items(Joi.string())
+    .max(6)
+    .required()
+    .messages({ "array.items": offerCreateMessage.EMPTY_TYPE_VALUE }),
 });

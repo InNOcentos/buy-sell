@@ -6,10 +6,10 @@ const { cookieStorageTime } = require('../controllers/constants')
 
 exports.setUserCookie = (refreshToken,accessToken,id,avatar,res) => {
   return res
-    .cookie(`user_refreshToken`, `${refreshToken}`, { maxAge: cookieStorageTime.refreshToken })
-    .cookie(`user_accessToken`, `${accessToken}`, { maxAge: cookieStorageTime.normalStorageTime })
-    .cookie(`user_id`, `${id}`, { maxAge: cookieStorageTime.normalStorageTime })
-    .cookie(`user_avatar`, `${avatar}`, { maxAge: cookieStorageTime.normalStorageTime })
+    .cookie(`user_refreshToken`, `${refreshToken}`, { maxAge: cookieStorageTime.refreshToken, sameSite: true })
+    .cookie(`user_accessToken`, `${accessToken}`, { maxAge: cookieStorageTime.normalStorageTime, sameSite: true })
+    .cookie(`user_id`, `${id}`, { maxAge: cookieStorageTime.normalStorageTime, sameSite: true })
+    .cookie(`user_avatar`, `${avatar}`, { maxAge: cookieStorageTime.normalStorageTime, sameSite: true })
     .redirect("back")
 };
 

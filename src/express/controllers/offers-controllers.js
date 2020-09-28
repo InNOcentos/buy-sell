@@ -176,7 +176,7 @@ exports.putPostEdit = async (req, res, next) => {
     });
 
     if (updatedOffer.statusCode === HttpCode.OK) {
-      return res.redirect(`/my`);
+      return res.clearCookie("user_offerEditId").redirect(`/my`);
     }
 
     if (
@@ -189,7 +189,7 @@ exports.putPostEdit = async (req, res, next) => {
     if (updatedOffer.statusCode === HttpCode.INTERNAL_SERVER_ERROR) {
       return res.status(HttpCode.INTERNAL_SERVER_ERROR).render(`errors/500`);
     }
-    return res.cookie(`user_offerEditId`, `${id}`, { maxAge: cookieStorageTime.normalStorageTime }).render(`offers/ticket-edit`, {
+    return res.cookie(`user_offerEditId`, `${id}`, { maxAge: cookieStorageTime.normalStorageTime, sameSite: true }).render(`offers/ticket-edit`, {
       categories: categoriesResult.body,
       offer,
       id,
