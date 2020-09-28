@@ -18,7 +18,7 @@ block content
               if errorsArr
                 each errorObj in errorsArr
                   if errorObj.path[0] == `picture`
-                    div(style="margin: 10px 0 0 0") #{errorObj.message}
+                    div.validation_error--custom(style="margin: 10px 0 0 0") #{errorObj.message}
             .ticket-form__content
               .ticket-form__row
                 .form__field
@@ -27,7 +27,7 @@ block content
                   if errorsArr
                     each errorObj in errorsArr
                       if errorObj.path[0] == `title`
-                        div(style="margin: 6px 0 0 0") #{errorObj.message}
+                        div.validation_error--custom(style="margin: 6px 0 0 0") #{errorObj.message}
               .ticket-form__row
                 .form__field
                   textarea#comment-field.js-field(name='description', cols='30', rows='10') #{offer.description}
@@ -35,7 +35,7 @@ block content
               if errorsArr
                 each errorObj in errorsArr
                   if errorObj.path[0] == `description`
-                    span(style="display: block !important; margin:-35px 0 20px 0") #{errorObj.message}
+                    span.validation_error--custom(style="display: block !important; margin:-35px 0 20px 0") #{errorObj.message}
               .ticket-form__row
                 select#category-field.form__select.js-multiple-select(name='category', data-label='Выбрать категорию публикации', multiple)
                   each category in categories
@@ -43,7 +43,7 @@ block content
               if errorsArr
                 each errorObj in errorsArr
                   if errorObj.path[0] == `category`
-                    span(style="display: block !important; margin:-27px 0 20px 0") #{errorObj.message}
+                    span.validation_error--custom(style="display: block !important; margin:-27px 0 20px 0") #{errorObj.message}
               .ticket-form__row
                 .form__field.form__field--price
                   input#price-field.js-field.js-price(type='number', name='sum',value=offer.sum)
@@ -60,5 +60,5 @@ block content
                   each errorObj in errorsArr
                     if errorObj.path[0] == `type` || errorObj.path[0] == 'sum'
                       li
-                        span(style="display: block !important;margin-bottom: 5px;") #{errorObj.message}
+                        span.validation_error--custom(style="display: block !important;margin-bottom: 5px;") #{errorObj.message}
             button.form__button.btn.btn--medium.js-button(type='submit') Сохранить
