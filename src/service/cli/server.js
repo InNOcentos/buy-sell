@@ -4,10 +4,9 @@ const express = require("express");
 
 const { HttpCode, API_PREFIX,ExitCode } = require(`../../constants`);
 const routes = require(`../api`);
-const getMockData = require(`../lib/get-mock-data`);
 const { getLogger } = require(`../logs/logger`);
 const logger = getLogger();
-const {sequelize, initDb} = require('../data-base');
+const {sequelize} = require('../data-base');
 
 const app = express();
 const DEFAULT_PORT = 3000;
