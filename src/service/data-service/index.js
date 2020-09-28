@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 const CategoryService = require(`./category`);
 const OfferService = require(`./offer`);
@@ -11,5 +11,5 @@ module.exports = {
   CommentService,
   OfferService,
   UserService,
-  RefreshTokenService
+  RefreshTokenService,
 };

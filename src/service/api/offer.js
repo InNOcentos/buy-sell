@@ -7,7 +7,7 @@ const {isOfferExists,offerValidator,commentValidator, authenticateJwt, ifIsUserO
 const {offerSchema,commentSchema} = require(`../schemas`);
 const route = new Router();
 
-module.exports = (app, offerService, commentService, userService) => {
+module.exports = (app, offerService, commentService, userService, logger) => {
   const isOfferExistsMiddleware = isOfferExists({service: offerService});
   const ifIsUserOfferCheckMiddleware = ifIsUserOfferCheck({service: userService});
 
@@ -24,6 +24,7 @@ module.exports = (app, offerService, commentService, userService) => {
 
       return res.status(HttpCode.OK).json({freshOffers,valuableOffers});
     } catch (error) {
+      logger.error(`Can't get offers. Error:${error.message}`)
       next(error);
     }
   });
@@ -37,6 +38,7 @@ module.exports = (app, offerService, commentService, userService) => {
 
       return res.status(HttpCode.CREATED).json(newOffer);
     } catch (error) {
+      logger.error(`Can't post offers. Error:${error.message}`)
       next(error);
     }
   });
@@ -49,6 +51,7 @@ module.exports = (app, offerService, commentService, userService) => {
      
       return res.status(HttpCode.OK).json(result);
     } catch (error) {
+      logger.error(`Can't get offers/my. Error:${error.message}`)
       next(error);
     }
   });
@@ -61,7 +64,7 @@ module.exports = (app, offerService, commentService, userService) => {
 
       return res.status(HttpCode.OK).json(offerData);
     } catch (error) {
-      console.log(error.message)
+      logger.error(`Can't get offers/:id. Error:${error.message}`)
       next(error);
     }
   });
@@ -69,12 +72,12 @@ module.exports = (app, offerService, commentService, userService) => {
   route.put(`/:offerId`,[offerValidator(offerSchema),authenticateJwt,ifIsUserOfferCheckMiddleware], async (req, res, next) => {
     const {offerId} = req.params;
     const {category, description, picture, title, type, sum} = req.body;
-    console.log({category, description, picture, title, type, sum})
     try {
       const updatedOffer = await offerService.update({id: offerId, category, description, picture, title, type, sum});
 
       return res.status(HttpCode.OK).json(updatedOffer);
     } catch (error) {
+      logger.error(`Can't put offers/:id. Error:${error.message}`)
       next(error);
     }
   });
@@ -87,6 +90,7 @@ module.exports = (app, offerService, commentService, userService) => {
 
       return res.status(HttpCode.OK).json(deletedOffer);
     } catch (error) {
+      logger.error(`Can't delete offers/:id. Error:${error.message}`)
       next(error);
     }
   });
@@ -98,6 +102,7 @@ module.exports = (app, offerService, commentService, userService) => {
 
       return res.status(HttpCode.OK).json(comments);
     } catch (error) {
+      logger.error(`Can't get offers/:id/comments. Error:${error.message}`)
       next(error);
     }
   });
@@ -112,6 +117,7 @@ module.exports = (app, offerService, commentService, userService) => {
 
       return res.status(HttpCode.CREATED).json(newComment);
     } catch (error) {
+      logger.error(`Can't post offers/:id/comments. Error:${error.message}`)
       next(error);
     }
   });
@@ -130,6 +136,7 @@ module.exports = (app, offerService, commentService, userService) => {
 
       return res.status(HttpCode.OK).json(deletedComment);
     } catch (error) {
+      logger.error(`Can't delete offers/:id/comments/:id. Error:${error.message}`)
       next(error);
     }
   });

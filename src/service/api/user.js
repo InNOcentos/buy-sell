@@ -10,7 +10,7 @@ const {jwt_refresh_secret} = require(`../../config`);
 
 const route = new Router();
 
-module.exports = (app, userService, RefreshTokenService) => {
+module.exports = (app, userService, RefreshTokenService,logger) => {
   const isUserExistsMiddleware = isUserExists({ service: userService});
   const authenticateMiddleware = authenticate({service: userService});
 
@@ -30,7 +30,7 @@ module.exports = (app, userService, RefreshTokenService) => {
         });
         return res.status(HttpCode.CREATED).json(newUser);
       } catch (error) {
-        
+        logger.error(`Can't post user/register. Error:${error.message}`)
         next(error);
       }
     }
@@ -48,7 +48,7 @@ module.exports = (app, userService, RefreshTokenService) => {
         .status(HttpCode.OK)
         .json({accessToken,refreshToken,userData: {id,avatar}})
     } catch (error) {
-      
+      logger.error(`Can't post user/login. Error:${error.message}`)
       next(error);
     }
   });
@@ -82,6 +82,7 @@ module.exports = (app, userService, RefreshTokenService) => {
           return res.status(HttpCode.OK).json({accessToken, refreshToken,userData: {id,avatar}});
       });
     } catch (error) {
+      logger.error(`Can't post user/refresh. Error:${error.message}`)
       next(error);
     }
     
@@ -93,6 +94,7 @@ module.exports = (app, userService, RefreshTokenService) => {
       RefreshTokenService.drop(token);
       return res.sendStatus(HttpCode.NO_CONTENT);
     } catch (error) {
+      logger.error(`Can't delete user/logout. Error:${error.message}`)
       next(error);
     }
       
@@ -107,6 +109,7 @@ module.exports = (app, userService, RefreshTokenService) => {
 
       return res.status(HttpCode.OK).json(haveRights);
     } catch (error) {
+      logger.error(`Can't get user/check. Error:${error.message}`)
       next(error);
     }
       

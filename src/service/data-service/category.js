@@ -1,9 +1,10 @@
-'use strict';
+"use strict";
 
 class CategoryService {
-  constructor(dataBase) {
-    const {models} = dataBase;
+  constructor(dataBase, logger) {
+    const { models } = dataBase;
 
+    this._logger = logger;
     this._dataBase = dataBase;
     this._models = models;
     this._selectOptions = {
@@ -12,13 +13,12 @@ class CategoryService {
   }
 
   async findAll() {
-    const {Category} = this._models;
+    const { Category } = this._models;
 
     try {
       return await Category.findAll(this._selectOptions);
     } catch (error) {
-      console.error(`Can't find categories. Error: ${ error }`);
-
+      this.logger.error(`Can't find categories. Error:${error.message}`);
       return null;
     }
   }

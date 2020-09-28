@@ -2,7 +2,6 @@
 
 const jwt = require(`jsonwebtoken`);
 const {HttpCode} = require(`../../constants`);
-
 const {jwt_access_secret} = require(`../../config`);
 
 module.exports = (req, res, next) => {
@@ -21,7 +20,6 @@ module.exports = (req, res, next) => {
     jwt.verify(token, jwt_access_secret, (err, userData) => {
         
         if (err) {
-
             return res.sendStatus(HttpCode.FORBIDDEN);
         }
         res.locals.user = userData;

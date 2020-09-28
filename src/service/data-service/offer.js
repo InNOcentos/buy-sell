@@ -1,10 +1,11 @@
 "use strict";
 
 class OfferService {
-  constructor(dataBase) {
+  constructor(dataBase, logger) {
     const { sequelize, models } = dataBase;
     const { Category } = models;
 
+    this._logger = logger;
     this._dataBase = dataBase;
     this._models = models;
     this._selectOptions = {
@@ -42,7 +43,7 @@ class OfferService {
     };
   }
 
-  async findAll({offset, limit }) {
+  async findAll({ offset, limit }) {
     const { Offer } = this._models;
 
     try {
@@ -61,8 +62,7 @@ class OfferService {
         quantity,
       };
     } catch (error) {
-      console.error(`Can't findAll offers. Error: ${error}`);
-
+      this._logger.error(`Can't findAll offers. Error:${error.message}`);
       return [];
     }
   }
@@ -86,8 +86,7 @@ class OfferService {
         quantity,
       };
     } catch (error) {
-      console.error(`Can't findAll offers. Error: ${error}`);
-
+      this._logger.error(`Can't findAll offers. Error:${error.message}`);
       return [];
     }
   }
@@ -97,9 +96,11 @@ class OfferService {
 
     try {
       const [quantity, offers] = await Promise.all([
-        Offer.count({where: {
-          userId: id,
-        },}),
+        Offer.count({
+          where: {
+            userId: id,
+          },
+        }),
         Offer.findAll({
           ...this._selectOptions,
           offset,
@@ -116,8 +117,7 @@ class OfferService {
         quantity,
       };
     } catch (error) {
-      console.error(`Can't findAll offers. Error: ${error}`);
-
+      this._logger.error(`Can't findAll offers. Error:${error.message}`);
       return [];
     }
   }
@@ -163,8 +163,7 @@ class OfferService {
 
       return await Offer.findByPk(newOffer.id, this._selectOptions);
     } catch (error) {
-      console.error(`Can't create offer. Error: ${error.message}`);
-
+      this._logger.error(`Can't create offer. Error:${error.message}`);
       return null;
     }
   }
@@ -177,8 +176,9 @@ class OfferService {
 
       return !!offer;
     } catch (error) {
-      console.error(`Can't check existence of offer. Error: ${error}`);
-
+      this._logger.error(
+        `Can't check existence of offer. Error:${error.message}`
+      );
       return false;
     }
   }
@@ -202,8 +202,7 @@ class OfferService {
       });
       return { offer, user, categoriesIds };
     } catch (error) {
-      console.error(`Can't find offer. Error: ${error}`);
-
+      this._logger.error(`Can't find offer. Error:${error.message}`);
       return null;
     }
   }
@@ -254,8 +253,7 @@ class OfferService {
 
       return await Offer.findByPk(updatedOffer.id, this._selectOptions);
     } catch (error) {
-      console.error(`Can't update offer. Error: ${error}`);
-
+      this._logger.error(`Can't update offer. Error:${error.message}`);
       return null;
     }
   }
@@ -279,8 +277,7 @@ class OfferService {
 
       return deletedOffer;
     } catch (error) {
-      console.error(`Can't delete offer. Error: ${error}`);
-
+      this._logger.error(`Can't delete offer. Error:${error.message}`);
       return null;
     }
   }
@@ -288,7 +285,6 @@ class OfferService {
   async findAllByTitle(title) {
     const { sequelize } = this._dataBase;
     const { Offer } = this._models;
-    console.log(title)
     try {
       return await Offer.findAll({
         ...this._selectOptions,
@@ -299,8 +295,9 @@ class OfferService {
         },
       });
     } catch (error) {
-      console.error(`Can't find offers with title: ${title}. Error: ${error}`);
-
+      this._logger.error(
+        `Can't find offers with title: ${title}. Error:${error.message}`
+      );
       return null;
     }
   }
@@ -311,7 +308,7 @@ class OfferService {
 
     try {
       const offers = await Offer.findAll({
-         attributes: [
+        attributes: [
           `id`,
           `title`,
           [`image`, `picture`],
@@ -326,13 +323,12 @@ class OfferService {
           where: {
             id: CategoryId,
           },
-        }
+        },
       });
 
       return await offers;
     } catch (error) {
-      console.error(`Can't find offers. Error: ${error}`);
-
+      this._logger.error(`Can't find offers. Error:${error.message}`);
       return null;
     }
   }

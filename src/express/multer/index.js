@@ -7,7 +7,6 @@ const storage = multer.diskStorage({
       next(null, path.resolve(__dirname,`../public/img/`));
     },
     filename: function (req, file, next) {
-        console.log(file);
         fileName.name = file;
         next(null,file.originalname);
     },
@@ -25,8 +24,7 @@ exports.uploadFile = async (req,res,next) => {
             return;
         }
         req.body.avatar = fileName.name.originalname;
-        next();
-        
+        next(); 
     })
 };
 

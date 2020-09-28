@@ -7,7 +7,7 @@ const { HttpCode } = require(`../../constants`);
 
 const route = new Router();
 
-module.exports = (app, categortyService) => {
+module.exports = (app, categortyService, logger) => {
   app.use(`/category`, route);
 
   route.get(`/`, async (req, res, next) => {
@@ -16,7 +16,7 @@ module.exports = (app, categortyService) => {
 
       return res.status(HttpCode.OK).json(categories);
     } catch (error) {
-      console.log(error.message)
+      logger.error(`Can't find categories. Error:${error.message}`)
     }
   });
 };

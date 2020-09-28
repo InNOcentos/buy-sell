@@ -1,6 +1,8 @@
 'use strict';
 
 const {HttpCode,registerMessage} = require(`../../constants`);
+const { getLogger } = require(`../logs/logger`);
+const logger = getLogger();
 
 module.exports = ({service}) => async (req, res, next) => {
   const {email} = req.body;
@@ -11,9 +13,10 @@ module.exports = ({service}) => async (req, res, next) => {
     if (isExists) {
       res.status(HttpCode.NOT_FOUND).json({userAlreadyExist: registerMessage.EMAIL_ALREADY_EXIST});
 
-      return console.error(`User with this email is already registerd: ${ email }.`);
+      return logger.info(`User with this email is already registerd: ${ email }.`);
     }
   } catch (error) {
+    logger.error(`Error: ${ error.message }.`);
     next(error);
   }
 

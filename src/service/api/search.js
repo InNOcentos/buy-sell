@@ -5,7 +5,7 @@ const { HttpCode } = require(`../../constants`);
 
 const route = new Router();
 
-module.exports = (app, offerService) => {
+module.exports = (app, offerService,logger) => {
   app.use(`/search`, route);
 
   route.get(`/`, async (req, res, next) => {
@@ -13,7 +13,7 @@ module.exports = (app, offerService) => {
     
     if (!decodedQuery) {
       res.status(HttpCode.BAD_REQUEST).send(`Invalid query`);
-      return console.error(`Invalid query.`);
+      return logger.error(`Invalid query.`);
     }
 
     try {
@@ -30,6 +30,7 @@ module.exports = (app, offerService) => {
 
       return res.status(HttpCode.OK).json(foundedOffers);
     } catch (error) {
+      logger.error(`Can't search offers. Error:${error.message}`)
       next(error);
     }
 
@@ -44,6 +45,7 @@ module.exports = (app, offerService) => {
 
       return res.status(HttpCode.OK).json(offersByCategory);
     } catch (error) {
+      logger.error(`Can't get search/:id. Error:${error.message}`)
       next(error);
     }
   });

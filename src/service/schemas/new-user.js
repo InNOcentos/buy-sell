@@ -1,7 +1,7 @@
 "use strict";
 
 const Joi = require(`joi`);
-const { registerMessage } = require(`../../constants`);
+const { registerMessage } = require(`./constants`);
 
 module.exports = Joi.object({
   firstName: Joi.string().min(1).max(50).required().messages({

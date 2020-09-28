@@ -1,7 +1,7 @@
 "use strict";
 
 const Joi = require(`joi`);
-const { offerCreateMessage } = require(`../../constants`);
+const { offerCreateMessage } = require(`./constants`);
 
 module.exports = Joi.object({
   category: Joi.array()

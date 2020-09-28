@@ -1,7 +1,7 @@
 "use strict";
 
 const Joi = require(`joi`);
-const { loginMessage } = require(`../../constants`);
+const { loginMessage } = require(`./constants`);
 
 module.exports = Joi.object({
   email: Joi.string().email().required().messages({

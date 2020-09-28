@@ -38,7 +38,7 @@ module.exports = {
         if (err) {
           return logger.error(`Server can't start. Error: ${err}`);
         }
-        return logger.info(`server start on ${port}`);
+        return logger.info(`Server start on ${port}`);
       });
     } catch (err) {
       logger.error(`An error has occurred. Error: ${err.message}`);

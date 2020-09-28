@@ -62,7 +62,6 @@ exports.getNewAccessToken = async (req,res,cb) => {
       const { id, avatar } = userData;
       cb(refreshToken, accessToken, id, avatar, res);
     }
-    console.log(statusCode);
     return res.redirect("/login");
   } catch (error) {
     console.log(error)
@@ -85,7 +84,6 @@ exports.ifIsUserOfferCheck = async (req,res, id) => {
       if (match !== true) {
         return res.redirect('/');
       }
-      console.log(`match: ${match}`);
     }
   } catch (error) {
     console.log(error)

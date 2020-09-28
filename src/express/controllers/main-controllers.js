@@ -249,11 +249,9 @@ exports.getLogout = async (req, res, next) => {
         if (statusCode === HttpCode.NO_CONTENT) {
           clearUserCookie(res);
         } else {
-          console.log(statusCode);
           return res.redirect("back");
         }
       }
-      console.log(statusCode);
       return res.redirect("back");
     }
     const { statusCode } = await request.delete({
@@ -266,7 +264,6 @@ exports.getLogout = async (req, res, next) => {
     if (statusCode === HttpCode.NO_CONTENT) {
       clearUserCookie(res);
     } else {
-      console.log(statusCode);
       return res.redirect("back");
     }
   } catch (error) {

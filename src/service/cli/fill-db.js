@@ -73,7 +73,6 @@ module.exports = {
 
       sequelize.close();
     } catch (error) {
-      console.log(error.message);
       console.log(chalk.red(`Can't fill database. Error: ${error}`));
     }
 

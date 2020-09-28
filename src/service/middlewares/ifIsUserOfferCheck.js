@@ -10,7 +10,6 @@ module.exports = ({service}) => (
         const haveRights = await service.checkRights(user_id,offer_id);
 
         if (!haveRights) {
-            console.log(`FORBIDDEN`)
             return res.status(HttpCode.FORBIDDEN)
                 .send(`You have no access to do it`);
         }
