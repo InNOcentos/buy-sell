@@ -4,6 +4,20 @@ const Joi = require(`joi`);
 const { offerCreateMessage } = require(`../../constants`);
 
 module.exports = Joi.object({
+  category: Joi.array()
+    .items(Joi.string())
+    .max(6)
+    .required()
+    .error((errors) => {
+      errors.forEach((err) => {
+        switch (err.type) {
+          default:
+            err.message = `${offerCreateMessage.EMPTY_VALUE}`;
+            break;
+        }
+      });
+      return errors;
+    }),
   title: Joi.string().min(2).max(100).required().messages({
     "string.min": offerCreateMessage.MIN_TITLE_LENGTH,
     "string.max": offerCreateMessage.MAX_TITLE_LENGTH,
@@ -25,9 +39,4 @@ module.exports = Joi.object({
     "string.max": offerCreateMessage.MAX_DESCRIPTION_LENGTH,
     "any.required": offerCreateMessage.EMPTY_VALUE,
   }),
-  category: Joi.array()
-    .items(Joi.string())
-    .max(6)
-    .required()
-    .messages({ "array.items": offerCreateMessage.EMPTY_TYPE_VALUE }),
 });
