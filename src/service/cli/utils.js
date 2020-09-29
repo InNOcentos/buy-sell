@@ -96,7 +96,7 @@ const readContent = async (filePath) => {
   try {
     const content = await fs.readFile(filePath, `utf-8`);
 
-    result = content.split(`\r\n`).filter(Boolean);
+    result = content.split(`\n`).filter(Boolean);
   } catch (error) {
     console.error(chalk.red(error));
   }
@@ -163,6 +163,7 @@ exports.createCategories = async () => {
         image,
       };
     });
+
   } catch (error) {
     console.error(chalk.red(`Can't create categories.`));
   }
