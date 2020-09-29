@@ -18,6 +18,7 @@ build/
 # Моки
 mocks.json
 test.json
+*.sql
 
 # TODO 
 fixes.todo
