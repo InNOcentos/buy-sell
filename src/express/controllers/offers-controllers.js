@@ -80,10 +80,23 @@ exports.postAddPost = async (req, res, next) => {
       ifUserAuthorisedCheck(req, res, clearUserCookie, setUserCookie);
     }
 
+    // вывод массива выбранных категорий по названиям
+    const selectedCategories = offer.category;
+    const allCategories = categoriesResult.body;
+
+    const selectedOffers = (function () {
+      return selectedCategories.map(element => {
+        for (let i=0;i<allCategories.length;i++) {
+          if (+element == allCategories[i]['id']) return allCategories[i]['title']
+        }
+      });
+    })(); 
+
     return res.render(`offers/new-ticket`, {
       errorsArr: body,
       categories: categoriesResult.body,
       offer,
+      selectedOffers,
       userData: {
         id: req.cookies.user_id,
         avatar: req.cookies.user_avatar,
@@ -122,9 +135,11 @@ exports.getPostEdit = async (req, res, next) => {
     
     offerImg = offersResult.body.offer.picture;
 
+
     return res.render(`offers/ticket-edit`, {
       offer: offersResult.body.offer,
       categories: categoriesResult.body,
+      selectedOffers: offersResult.body.offer.category,
       userData: {
         id: req.cookies.user_id,
         avatar: req.cookies.user_avatar,
@@ -189,10 +204,26 @@ exports.putPostEdit = async (req, res, next) => {
     if (updatedOffer.statusCode === HttpCode.INTERNAL_SERVER_ERROR) {
       return res.status(HttpCode.INTERNAL_SERVER_ERROR).render(`errors/500`);
     }
+
+
+    const selectedCategories = offer.category;
+    const allCategories = categoriesResult.body;
+
+    const selectedOffers = (function () {
+      return selectedCategories.map(element => {
+        for (let i=0;i<allCategories.length;i++) {
+          if (+element == allCategories[i]['id']) return allCategories[i]['title']
+        }
+      });
+    })(); 
+
+    console.log(selectedOffers)
+
     return res.cookie(`user_offerEditId`, `${id}`, { maxAge: cookieStorageTime.normalStorageTime, sameSite: true }).render(`offers/ticket-edit`, {
       categories: categoriesResult.body,
       offer,
       id,
+      selectedOffers,
       errorsArr: updatedOffer.body,
       userData: {
         id: req.cookies.user_id,

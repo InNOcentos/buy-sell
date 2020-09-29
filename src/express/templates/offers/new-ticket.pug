@@ -48,7 +48,7 @@ block content
               .ticket-form__row
                 select#category-field.form__select.js-multiple-select(name='category', data-label='Выбрать категорию публикации', multiple)
                   each category in categories
-                    option(value=(category.id), selected=(offer && offer.category ? offer.category.includes(category.title) : false)) #{category.title}
+                    option(value=(category.id), selected=(offer && offer.category ? selectedOffers.includes(category.title) : false)) #{category.title}
               if errorsArr
                 each errorObj in errorsArr
                   if errorObj.path[0] == `category`
