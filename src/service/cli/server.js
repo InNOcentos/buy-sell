@@ -24,7 +24,7 @@ module.exports = {
   name: `--server`,
   async run(args) {
     const [customPort] = args;
-    const port = Number.parseInt(customPort, 10) || DEFAULT_PORT;
+    const port = process.env.PORT || Number.parseInt(customPort, 10) || DEFAULT_PORT;
 
     try {
       await sequelize.sync();

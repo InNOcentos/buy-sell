@@ -4,8 +4,7 @@
   "description": "Куплю. Продам",
   "main": "./src/service/service.js",
   "scripts": {
-    "start": "node ./src/service/service.js",
-    "start-server": "nodemon ./src/service/service.js --server 3000 | pino-pretty",
+    "start": "nodemon ./src/service/service.js --server 3000 | pino-pretty",
     "start-f-server": "nodemon ./src/express/index.js"
   },
   "repository": {
