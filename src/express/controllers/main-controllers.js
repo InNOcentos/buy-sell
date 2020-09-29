@@ -162,8 +162,6 @@ exports.post_signUpPage = async (req, res, next) => {
       return res.redirect(`/login`);
     }
 
-    
-
     return res.render(`sign-up`, {
       userData: {
         name: [userData.firstName, userData.lastName],
@@ -171,7 +169,7 @@ exports.post_signUpPage = async (req, res, next) => {
         avatar: userData.avatar,
       },
       errorsArr: body.details,
-      userAlreadyExist: body.alreadyExists,
+      userAlreadyExist: body.userAlreadyExist,
     });
   } catch (error) {
     next(error);
